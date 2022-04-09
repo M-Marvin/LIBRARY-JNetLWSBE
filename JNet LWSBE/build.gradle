@@ -2,8 +2,11 @@
 plugins {
     id 'java-library'
     id 'eclipse'
-    id 'maven'
 }
+
+apply plugin: 'maven-publish'
+    
+group = 'com.github.M-Marvin'
 
 // Fixes an eclipse bug, that resets the jre after every gradle task
 eclipse {
