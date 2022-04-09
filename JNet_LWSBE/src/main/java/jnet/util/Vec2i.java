@@ -25,7 +25,7 @@ public class Vec2i implements IVector<Integer> {
 		this.y = y;
 	}
 	
-	public Vec2i(IVector<?> v) {
+	public Vec2i(IVector<? extends Number> v) {
 		this.x = (int) v.getVecX();
 		this.y = (int) v.getVecY();	
 	}
