@@ -33,7 +33,7 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
-			from JNet_LWSBE.java
+			from components.java
         }
     }
 }
