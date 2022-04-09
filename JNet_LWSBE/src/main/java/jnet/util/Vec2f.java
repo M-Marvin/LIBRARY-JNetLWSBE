@@ -26,8 +26,8 @@ public class Vec2f implements IVector<Float> {
 	}
 	
 	public Vec2f(IVector<? extends Number> v) {
-		this.x = (float) v.getVecX();
-		this.y = (float) v.getVecY();	
+		this.x = (Float) v.getVecX();
+		this.y = (Float) v.getVecY();	
 	}
 	
 	public Vec2f mul(Vec2f v2) {

@@ -26,8 +26,8 @@ public class Vec2i implements IVector<Integer> {
 	}
 	
 	public Vec2i(IVector<? extends Number> v) {
-		this.x = (int) v.getVecX();
-		this.y = (int) v.getVecY();	
+		this.x = (Integer) v.getVecX();
+		this.y = (Integer) v.getVecY();	
 	}
 	
 	public Vec2i mul(Vec2i v2) {

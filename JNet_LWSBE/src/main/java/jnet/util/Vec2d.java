@@ -26,8 +26,8 @@ public class Vec2d implements IVector<Double> {
 	}
 	
 	public Vec2d(IVector<? extends Number> v) {
-		this.x = (double) v.getVecX();
-		this.y = (double) v.getVecY();	
+		this.x = (Double) v.getVecX();
+		this.y = (Double) v.getVecY();	
 	}
 	
 	public Vec2d mul(Vec2d v2) {
