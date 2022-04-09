@@ -1,19 +1,28 @@
 
-apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 group = 'com.github.M-Marvin'
-version = '2.0'
 
-sourceCompatibility = 1.8 // java 8
-targetCompatibility = 1.8
+// Fixes an eclipse bug, that resets the jre after every gradle task
+eclipse {
+    classpath {
+        file {
+            whenMerged {
+                def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
+                jre.path = 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-17.0.2'
+            }
+        }
+    }
+}
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-
+    implementation fileTree(dir: 'libs', include: '*.jar')
 }
 
 java {
@@ -24,12 +33,11 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
-		from components.java
+			from JNet_LWSBE.java
         }
     }
 }
-
-wrapper {
-    gradleVersion = "7.4.2"
-    distributionType = Wrapper.DistributionType.ALL
+jar {
+	manifest {
+	}
 }
