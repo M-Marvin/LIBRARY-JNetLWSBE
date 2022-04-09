@@ -15,6 +15,9 @@ eclipse {
             }
         }
     }
+    project {
+        name = 'JNet_LWSBE'
+    }
 }
 
 repositories {
