@@ -1,11 +1,15 @@
 
+repositories {
+    mavenCentral()
+}
+
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 group = 'com.github.M-Marvin'
 
-// Fixes an eclipse bug, that resets the jre after every gradle task
+// Fixes an eclipse bug, that resets the jre and the project name after every gradle task
 eclipse {
     classpath {
         file {
@@ -20,10 +24,7 @@ eclipse {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
+// Include all required libarys for debuging
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
 }
