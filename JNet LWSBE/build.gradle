@@ -2,6 +2,7 @@
 plugins {
     id 'java-library'
     id 'eclipse'
+    id 'maven'
 }
 
 // Fixes an eclipse bug, that resets the jre after every gradle task
