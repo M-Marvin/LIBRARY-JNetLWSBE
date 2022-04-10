@@ -1,6 +1,6 @@
 package jnet.util;
 
-public class Vec2f implements IVector2<Float> {
+public class Vec2f implements IVector2D<Float> {
 	
 	public float x;
 	public float y;
@@ -25,7 +25,7 @@ public class Vec2f implements IVector2<Float> {
 		this.y = y;
 	}
 	
-	public Vec2f(IVector2<? extends Number> v) {
+	public Vec2f(IVector2D<? extends Number> v) {
 		this.x = (Float) v.getVecX();
 		this.y = (Float) v.getVecY();	
 	}

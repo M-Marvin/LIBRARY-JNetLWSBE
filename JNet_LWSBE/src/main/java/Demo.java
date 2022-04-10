@@ -21,11 +21,11 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import jnet.JNet;
-import jnet.d3.physic.PhysicSolver;
-import jnet.d3.physic.PhysicWorld;
-import jnet.d3.physic.SoftBody;
-import jnet.d3.physic.SoftBody.Constrain;
-import jnet.d3.shapefactory.Shape;
+import jnet.d2.physic.PhysicSolver2d;
+import jnet.d2.physic.PhysicWorld2d;
+import jnet.d2.physic.SoftBody2d;
+import jnet.d2.physic.SoftBody2d.Constrain2d;
+import jnet.d2.shapefactory.Shape2d;
 import jnet.render.ShapeBeamRenderer;
 import jnet.util.Vec2d;
 
@@ -109,8 +109,8 @@ public class Demo {
 	
 	//####################################################
 	
-	public PhysicWorld world;
-	public PhysicSolver solver;
+	public PhysicWorld2d world;
+	public PhysicSolver2d solver;
 	
 	public ShapeBeamRenderer renderer;
 	
@@ -118,9 +118,9 @@ public class Demo {
 						
 		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), 20, 20);
 		
-		this.world = JNet.setupWorld(new Vec2d());
+		this.world = JNet.D2.setupWorld(new Vec2d());
 		
-		Shape shape2 = JNet.buildShape()
+		Shape2d shape2 = JNet.D2.buildShape()
 				.addShapeRectangleCross(-300, -300, -200, -200)
 				.addShapeRectangleCross(-300, -200, -200, -100)
 				.addShapeRectangleCross(-300, -100, -200, -0)
@@ -132,23 +132,23 @@ public class Demo {
 				.addShapeRectangleCross(-100, -100, -0, -0)
 				.build();
 		shape2.changeMaterial(JNet.DEFAULT_MATERIAL_METAL);
-		SoftBody object1 = shape2.build();
+		SoftBody2d object1 = shape2.build();
 		
 		this.world.addSoftBody(object1);
 		
-		Shape shape = JNet.buildShape()
+		Shape2d shape = JNet.D2.buildShape()
 				.addShapeRectangle(0, 10, 120, 130)
 				.addTriangle(0, 10, -120, 10, 0, 130)
 				.addShapeRectangleCross(0, 130, 120, 250)
 				.addTriangle(-120, 10, 0, 250, -120, 130)
 				.build();
-		SoftBody object2 = shape.build();
+		SoftBody2d object2 = shape.build();
 		this.world.addSoftBody(object2);
 		
-		Constrain joint = new Constrain(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
+		Constrain2d joint = new Constrain2d(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
 		this.world.addJoint(joint);
 		
-		this.solver = JNet.setupSolver(world);
+		this.solver = JNet.D2.setupSolver(world);
 		
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 			if (key == GLFW_KEY_RIGHT) {

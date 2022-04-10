@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.d3.shapefactory.Material;
-import jnet.d3.shapefactory.Shape.ConstrainDefinition;
-import jnet.d3.shapefactory.Shape.ParticleDefinition;
+import jnet.d3.shapefactory.Shape3d.ConstrainDefinition3d;
+import jnet.d3.shapefactory.Shape3d.ParticleDefinition3d;
+import jnet.util.Material;
 import jnet.util.Vec3d;
 
 /**
@@ -14,36 +14,36 @@ import jnet.util.Vec3d;
  * @author M_Marvin
  *
  */
-public class SoftBody {
+public class SoftBody3d {
 	
-	protected List<Constrain> constrains;
-	protected List<Particle> particles;
-	protected ContactListener contactListener;
+	protected List<Constrain3d> constrains;
+	protected List<Particle3d> particles;
+	protected ContactListener3d contactListener;
 	
 	/**
 	 * Creates a clone instance of the original SoftBody, it does not create a new SoftBody. The ContactListener is not copied.
 	 * @param body The SoftBody to create a clone instance
 	 */
-	public SoftBody(SoftBody body) {
+	public SoftBody3d(SoftBody3d body) {
 		this.constrains = body.constrains;
 		this.particles = body.particles;
-		this.contactListener = new ContactListener.DummyListener();
+		this.contactListener = new ContactListener3d.DummyListener();
 	}
 	
 	/**
 	 * Creates a empty SoftBody, Constrains and its Particles can be added manually.
 	 */
-	public SoftBody() {
-		this.constrains = new ArrayList<Constrain>();
-		this.particles = new ArrayList<Particle>();
-		this.contactListener = new ContactListener.DummyListener();
+	public SoftBody3d() {
+		this.constrains = new ArrayList<Constrain3d>();
+		this.particles = new ArrayList<Particle3d>();
+		this.contactListener = new ContactListener3d.DummyListener();
 	}
 	
 	/**
 	 * Adds the Constrain and (if not already added) its Particles to this SoftBody
 	 * @param constrain The Constrain to add
 	 */
-	public void addConstrain(Constrain constrain) {
+	public void addConstrain(Constrain3d constrain) {
 		this.constrains.add(constrain);
 		if (!this.particles.contains(constrain.pointA)) this.particles.add(constrain.pointA);
 		if (!this.particles.contains(constrain.pointB)) this.particles.add(constrain.pointB);
@@ -57,11 +57,11 @@ public class SoftBody {
 		this.constrains.forEach((constrain) -> constrain.changeMaterial(material));
 	}
 	
-	public List<Constrain> getConstrains() {
+	public List<Constrain3d> getConstrains() {
 		return constrains;
 	}
 	
-	public List<Particle> getParticles() {
+	public List<Particle3d> getParticles() {
 		return particles;
 	}
 	
@@ -69,7 +69,7 @@ public class SoftBody {
 	 * Sets the ContactListener which receives any collision-events between this and all other objects (including collisions between Constrains of this object).
 	 * @param contactListener The ContactListener that receives all events
 	 */
-	public void setContactListener(ContactListener contactListener) {
+	public void setContactListener(ContactListener3d contactListener) {
 		if (contactListener == null) throw new RuntimeException(new IllegalArgumentException("Cant set the ContactListener to null!"));
 		this.contactListener = contactListener;
 	}
@@ -78,17 +78,17 @@ public class SoftBody {
 	 * Removes the ContactListener and replaces it by a DummyListener which always returns true on the beginContact() event.
 	 */
 	public void removeContactLitener() {
-		setContactListener(new ContactListener.DummyListener());
+		setContactListener(new ContactListener3d.DummyListener());
 	}
 	
-	public ContactListener getContactListener() {
+	public ContactListener3d getContactListener() {
 		return contactListener;
 	}
 	
-	public static class Constrain {
+	public static class Constrain3d {
 		
-		public Particle pointA;
-		public Particle pointB;
+		public Particle3d pointA;
+		public Particle3d pointB;
 		public double length;
 		public double originalLength;
 		public boolean broken = false;
@@ -100,7 +100,7 @@ public class SoftBody {
 		 * Construct Constrain using ConstrainDefinition
 		 * @param definition Definition for this Constrain
 		 */
-		public Constrain(ConstrainDefinition definition) {
+		public Constrain3d(ConstrainDefinition3d definition) {
 			this.pointA = definition.pointA.lastBuild;
 			this.pointB = definition.pointB.lastBuild;
 			this.length = pointA.pos.distance(pointB.pos);
@@ -116,7 +116,7 @@ public class SoftBody {
 		 * @param pointB Node B of the Constrain
 		 * @param material Combined Material-Info
 		 */
-		public Constrain(Particle pointA, Particle pointB, Material material) {
+		public Constrain3d(Particle3d pointA, Particle3d pointB, Material material) {
 			this.pointA = pointA;
 			this.pointB = pointB;
 			this.length = pointA.pos.distance(pointB.pos);
@@ -129,7 +129,7 @@ public class SoftBody {
 		 * @param pointA Node A of the Constrain
 		 * @param pointB Node B of the Constrain
 		 */
-		public Constrain(Particle pointA, Particle pointB) {
+		public Constrain3d(Particle3d pointA, Particle3d pointB) {
 			this.pointA = pointA;
 			this.pointB = pointB;
 			this.length = pointA.pos.distance(pointB.pos);
@@ -151,7 +151,7 @@ public class SoftBody {
 		
 	}
 	
-	public static class Particle {
+	public static class Particle3d {
 	
 		public Vec3d pos = new Vec3d();
 		public Vec3d lastPos = new Vec3d();
@@ -162,7 +162,7 @@ public class SoftBody {
 		 * Construct Particle (Node) using ParticleDefinition
 		 * @param definition Definition for this Particle
 		 */
-		public Particle(ParticleDefinition definition) {
+		public Particle3d(ParticleDefinition3d definition) {
 			this.pos = definition.pos;
 			this.lastPos = pos;
 			this.acceleration = new Vec3d();
@@ -174,7 +174,7 @@ public class SoftBody {
 		 * @param pos Position of the Node
 		 * @param material Combined Material-Info
 		 */
-		public Particle(Vec3d pos, Material material) {
+		public Particle3d(Vec3d pos, Material material) {
 			this.pos = pos;
 			this.lastPos = pos;
 			this.acceleration = new Vec3d();
@@ -185,7 +185,7 @@ public class SoftBody {
 		 * Construct Particle (Node) using Position and default Material
 		 * @param pos Position of the Node
 		 */
-		public Particle(Vec3d pos) {
+		public Particle3d(Vec3d pos) {
 			this.pos = pos;
 			this.lastPos = pos;
 			this.acceleration = new Vec3d();

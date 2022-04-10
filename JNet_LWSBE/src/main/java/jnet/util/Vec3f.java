@@ -1,6 +1,6 @@
 package jnet.util;
 
-public class Vec3f implements IVector3<Float> {
+public class Vec3f implements IVector3D<Float> {
 	
 	public float x;
 	public float y;
@@ -33,7 +33,7 @@ public class Vec3f implements IVector3<Float> {
 		this.z = z;
 	}
 	
-	public Vec3f(IVector3<? extends Number> v) {
+	public Vec3f(IVector3D<? extends Number> v) {
 		this.x = (Float) v.getVecX();
 		this.y = (Float) v.getVecY();
 		this.z = (Float) v.getVecZ();

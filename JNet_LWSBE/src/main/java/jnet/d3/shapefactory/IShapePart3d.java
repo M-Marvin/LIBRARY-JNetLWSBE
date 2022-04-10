@@ -2,7 +2,7 @@ package jnet.d3.shapefactory;
 
 import java.util.List;
 
-import jnet.d3.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape3d.ConstrainDefinition3d;
 
 /**
  * This is the interface for making custom ShapeBuilders for the ShapeFactory.
@@ -10,8 +10,8 @@ import jnet.d3.shapefactory.Shape.ConstrainDefinition;
  * @author M_Marvin
  *
  */
-public interface IShapePart {
+public interface IShapePart3d {
 	
-	public List<ConstrainDefinition> getConstrains();
+	public List<ConstrainDefinition3d> getConstrains();
 	
 }

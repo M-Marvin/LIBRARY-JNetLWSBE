@@ -1,34 +1,35 @@
-package jnet.d3.shapefactory;
+package jnet.d2.shapefactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.d3.physic.SoftBody;
-import jnet.d3.physic.SoftBody.Constrain;
-import jnet.d3.physic.SoftBody.Particle;
-import jnet.util.Vec3d;
+import jnet.d2.physic.SoftBody2d;
+import jnet.d2.physic.SoftBody2d.Constrain2d;
+import jnet.d2.physic.SoftBody2d.Particle2d;
+import jnet.util.Material;
+import jnet.util.Vec2d;
 
 /**
  * The Shape is like a Definition of a SoftBody, it can produce multiple identical SoftBodys.
  * @author M_Marvin
  *
  */
-public class Shape {
+public class Shape2d {
 	
-	protected List<ConstrainDefinition> constrains;
-	protected List<ParticleDefinition> particles;
+	protected List<ConstrainDefinition2d> constrains;
+	protected List<ParticleDefinition2d> particles;
 	
-	public Shape() {
-		this.constrains = new ArrayList<ConstrainDefinition>();
-		this.particles = new ArrayList<ParticleDefinition>();
+	public Shape2d() {
+		this.constrains = new ArrayList<ConstrainDefinition2d>();
+		this.particles = new ArrayList<ParticleDefinition2d>();
 	}
 	
 	/**
 	 * Adds a constrain definition and (if not already added) its particle definitions to this Shape
 	 * @param constrain The constrain definition to add
 	 */
-	public void addConstrain(ConstrainDefinition constrain) {
+	public void addConstrain(ConstrainDefinition2d constrain) {
 		this.constrains.add(constrain);
 		if (!this.particles.contains(constrain.pointA)) this.particles.add(constrain.pointA);
 		if (!this.particles.contains(constrain.pointB)) this.particles.add(constrain.pointB);
@@ -46,8 +47,8 @@ public class Shape {
 	 * Creates a new SoftBody with the parameters of this Shape
 	 * @return A new SoftBody instance with the parameters of this Shape
 	 */
-	public SoftBody build() {
-		SoftBody body = new SoftBody();
+	public SoftBody2d build() {
+		SoftBody2d body = new SoftBody2d();
 		this.particles.forEach((particleDefinition) -> {
 			particleDefinition.build();
 		});
@@ -63,9 +64,9 @@ public class Shape {
 	 * @param y The y position of the ParticleDefinition
 	 * @return The first matching ParticleDefinition or null if no one is found
 	 */
-	public ParticleDefinition searchNode(float x, float y, float z) {
-		Vec3d position = new Vec3d(x, y, z);
-		for (ParticleDefinition node : this.particles) {
+	public ParticleDefinition2d searchNode(float x, float y) {
+		Vec2d position = new Vec2d(x, y);
+		for (ParticleDefinition2d node : this.particles) {
 			if (node.pos.equals(position)) return node;
 		}
 		return null;
@@ -75,8 +76,8 @@ public class Shape {
 	 * @param position The position of the ParticleDefinition
 	 * @return The first matching ParticleDefinition or null if no one is found
 	 */
-	public ParticleDefinition searchNode(Vec3d position) {
-		for (ParticleDefinition node : this.particles) {
+	public ParticleDefinition2d searchNode(Vec2d position) {
+		for (ParticleDefinition2d node : this.particles) {
 			if (node.pos.equals(position)) return node;
 		}
 		return null;
@@ -88,12 +89,12 @@ public class Shape {
 	 * @param position2 The position of the second ParticleDefinition
 	 * @return The first matching ConstrainDefinition or null if no one is found
 	 */
-	public ConstrainDefinition searchBeam(Vec3d position1, Vec3d position2) {
-		ParticleDefinition node1 = searchNode(position1);
+	public ConstrainDefinition2d searchBeam(Vec2d position1, Vec2d position2) {
+		ParticleDefinition2d node1 = searchNode(position1);
 		if (node1 == null) return null;
-		ParticleDefinition node2 = searchNode(position2);
+		ParticleDefinition2d node2 = searchNode(position2);
 		if (node2 == null) return null;
-		for (ConstrainDefinition beam : this.constrains) {
+		for (ConstrainDefinition2d beam : this.constrains) {
 			if ((beam.pointA.equals(node1) && beam.pointB.equals(node2)) || (beam.pointA.equals(node2) && beam.pointB.equals(node1))) return beam;
 		}
 		return null;
@@ -107,12 +108,12 @@ public class Shape {
 	 * @param y2 The y position of the second ParticleDefinition
 	 * @return The first matching ConstrainDefinition or null if no one is found
 	 */
-	public ConstrainDefinition searchBeam(float x1, float y1, float z1, float x2, float y2, float z2) {
-		ParticleDefinition node1 = searchNode(x1, y1, z1);
+	public ConstrainDefinition2d searchBeam(float x1, float y1, float x2, float y2) {
+		ParticleDefinition2d node1 = searchNode(x1, y1);
 		if (node1 == null) return null;
-		ParticleDefinition node2 = searchNode(x2, y2, z1);
+		ParticleDefinition2d node2 = searchNode(x2, y2);
 		if (node2 == null) return null;
-		for (ConstrainDefinition beam : this.constrains) {
+		for (ConstrainDefinition2d beam : this.constrains) {
 			if ((beam.pointA.equals(node1) && beam.pointB.equals(node2)) || (beam.pointA.equals(node2) && beam.pointB.equals(node1))) return beam;
 		}
 		return null;
@@ -120,17 +121,17 @@ public class Shape {
 	
 	/** ##########################################################**/
 	
-	public static class ConstrainDefinition {
+	public static class ConstrainDefinition2d {
 		
-		public ParticleDefinition pointA = new ParticleDefinition(); // Only for the equals check
-		public ParticleDefinition pointB = new ParticleDefinition(); // Only for the equals check
+		public ParticleDefinition2d pointA = new ParticleDefinition2d(); // Only for the equals check
+		public ParticleDefinition2d pointB = new ParticleDefinition2d(); // Only for the equals check
 		public float stiffness;
 		public float deformForce;
 		public float maxBending;
 		
-		public ConstrainDefinition() {}
+		public ConstrainDefinition2d() {}
 		
-		public ConstrainDefinition(ParticleDefinition pointA, ParticleDefinition pointB) {
+		public ConstrainDefinition2d(ParticleDefinition2d pointA, ParticleDefinition2d pointB) {
 			this.pointA = pointA;
 			this.pointB = pointB;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
@@ -154,35 +155,35 @@ public class Shape {
 		 * @return A new Constrain with the parameters of this definition
 		 * @throws RuntimeException of a IllegalStateException when the used ParticleDefinitions are not build
 		 */
-		public Constrain build() {
+		public Constrain2d build() {
 			if (this.pointA.lastBuild == null || this.pointB.lastBuild == null) throw new RuntimeException(new IllegalStateException("Cant build Constrain bevore the Particles are not build!"));
-			return new Constrain(this);
+			return new Constrain2d(this);
 		}
 		
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof ConstrainDefinition) {
-				return	((ConstrainDefinition) obj).pointA.equals(this.pointA) &&
-						((ConstrainDefinition) obj).pointB.equals(this.pointB) &&
-						((ConstrainDefinition) obj).stiffness == this.stiffness &&
-						((ConstrainDefinition) obj).deformForce == this.deformForce &&
-						((ConstrainDefinition) obj).maxBending == this.maxBending;
+			if (obj instanceof ConstrainDefinition2d) {
+				return	((ConstrainDefinition2d) obj).pointA.equals(this.pointA) &&
+						((ConstrainDefinition2d) obj).pointB.equals(this.pointB) &&
+						((ConstrainDefinition2d) obj).stiffness == this.stiffness &&
+						((ConstrainDefinition2d) obj).deformForce == this.deformForce &&
+						((ConstrainDefinition2d) obj).maxBending == this.maxBending;
 			}
 			return false;
 		}
 		
 	}
 	
-	public static class ParticleDefinition {
+	public static class ParticleDefinition2d {
 		
-		public Vec3d pos = new Vec3d();
+		public Vec2d pos = new Vec2d();
 		public float mass;
 		
-		public Particle lastBuild;
+		public Particle2d lastBuild;
 		
-		public ParticleDefinition() {}
+		public ParticleDefinition2d() {}
 		
-		public ParticleDefinition(Vec3d pos) {
+		public ParticleDefinition2d(Vec2d pos) {
 			this.pos = pos;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
@@ -198,27 +199,27 @@ public class Shape {
 		 * Creates a new instance of Particle with this parameters
 		 * @return A new Particle with the parameters of this definition
 		 */
-		public Particle build() {
-			this.lastBuild = new Particle(this);
+		public Particle2d build() {
+			this.lastBuild = new Particle2d(this);
 			return this.lastBuild;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof ParticleDefinition) {
-				return	((ParticleDefinition) obj).pos.equals(this.pos) &&
-						((ParticleDefinition) obj).mass == this.mass;
+			if (obj instanceof ParticleDefinition2d) {
+				return	((ParticleDefinition2d) obj).pos.equals(this.pos) &&
+						((ParticleDefinition2d) obj).mass == this.mass;
 			}
 			return false;
 		}
 		
 	}
 
-	public List<ConstrainDefinition> getConstrains() {
+	public List<ConstrainDefinition2d> getConstrains() {
 		return constrains;
 	}
 
-	public List<ParticleDefinition> getParticles() {
+	public List<ParticleDefinition2d> getParticles() {
 		return particles;
 	}
 	

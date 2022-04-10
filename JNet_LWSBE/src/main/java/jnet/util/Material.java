@@ -1,4 +1,4 @@
-package jnet.d3.shapefactory;
+package jnet.util;
 
 /**
  * A class that combines all important properties of Constrains and Particles, like stiffness, deformForce, maxBending and mass.

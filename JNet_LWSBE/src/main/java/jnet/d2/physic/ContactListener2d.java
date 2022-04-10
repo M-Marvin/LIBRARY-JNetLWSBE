@@ -1,4 +1,4 @@
-package jnet.d3.physic;
+package jnet.d2.physic;
 
 /**
  * An abstract class to extend from that recives all collisions of the object that is bound to it (can be a SoftBody or the PhysicWorld).
@@ -6,7 +6,7 @@ package jnet.d3.physic;
  * @author M_Marvin
  *
  */
-public abstract class ContactListener {
+public abstract class ContactListener2d {
 	
 	/**
 	 * Called before the collision is solved, returning false, prevents the PhysicSolver from solving this contact.
@@ -15,19 +15,19 @@ public abstract class ContactListener {
 	 * @param contact The Contact representing all informations about the collision
 	 * @return true if the contact must be solved, false otherwise
 	 */
-	public abstract boolean beginContact(Contact contact);
+	public abstract boolean beginContact(Contact2d contact);
 	
 	/**
 	 * Called after the the collision is solved, and only if the previous method has returned true.
 	 * @param contact The Contact representing all informations about the collision
 	 */
-	public abstract void endContact(Contact contact);
+	public abstract void endContact(Contact2d contact);
 	
-	public static class DummyListener extends ContactListener {
-		public boolean beginContact(Contact contact) {
+	public static class DummyListener extends ContactListener2d {
+		public boolean beginContact(Contact2d contact) {
 			return true;
 		}
-		public void endContact(Contact contact) {}
+		public void endContact(Contact2d contact) {}
 	}
 	
 }

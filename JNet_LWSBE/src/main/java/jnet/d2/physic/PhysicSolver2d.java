@@ -1,27 +1,26 @@
-package jnet.d3.physic;
+package jnet.d2.physic;
 
 import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
 import jnet.JNet;
-import jnet.d3.physic.SoftBody.Constrain;
-import jnet.d3.physic.SoftBody.Particle;
+import jnet.d2.physic.SoftBody2d.Constrain2d;
+import jnet.d2.physic.SoftBody2d.Particle2d;
 import jnet.util.Vec2d;
-import jnet.util.Vec3d;
 
 /**
  * The core of the PhysicEngine, the solver handles the forces on the Particles, the movement, the collisions and the constrains.
- * It is bound to a PhysicWorld and simulates the objects in it.
+ * It is bound to a PhysicWorld2d and simulates the objects in it.
  * @author M_Marvin
  *
  */
-public class PhysicSolver {
+public class PhysicSolver2d {
 	
 	protected int itterationCount;
-	protected PhysicWorld world;
+	protected PhysicWorld2d world;
 	
-	public PhysicSolver(PhysicWorld world) {
+	public PhysicSolver2d(PhysicWorld2d world) {
 		this.world = world;
 		this.itterationCount = JNet.DEFAULT_NUM_ITTERATIONS;
 	}
@@ -30,7 +29,7 @@ public class PhysicSolver {
 	 * Manually changes the world, that this solver handles
 	 * @param world The new world for this solver
 	 */
-	public void setWorld(PhysicWorld world) {
+	public void setWorld(PhysicWorld2d world) {
 		this.world = world;
 	}
 	
@@ -38,7 +37,7 @@ public class PhysicSolver {
 	 * Gets the world that this solver currently handles
 	 * @return
 	 */
-	public PhysicWorld getWorld() {
+	public PhysicWorld2d getWorld() {
 		return world;
 	}
 	
@@ -70,7 +69,7 @@ public class PhysicSolver {
 		
 		// Solve Joints
 		for (int itteration = 0; itteration < itterationCount; itteration++) {
-			for (Constrain constrain : this.world.getJoints()) {
+			for (Constrain2d constrain : this.world.getJoints()) {
 				if (!constrain.broken) {
 					constrain(itteration + 1, constrain);
 				}
@@ -88,18 +87,18 @@ public class PhysicSolver {
 			for (int itteration = 0; itteration < itterationCount; itteration++) {
 				
 				// Satisfy Constrains
-				for (Constrain constrain : shape.getConstrains()) {
+				for (Constrain2d constrain : shape.getConstrains()) {
 					if (!constrain.broken) {
 						constrain(itteration + 1, constrain);
 					}
 				}
 				
 				// Check Constrain-collisions
-				HashMap<Contact, SoftBody> collisions = new HashMap<Contact, SoftBody>();
+				HashMap<Contact2d, SoftBody2d> collisions = new HashMap<Contact2d, SoftBody2d>();
 				shape.getParticles().forEach((particle) -> {
 					this.world.getSoftBodys().forEach((shape2) -> shape2.getConstrains().forEach((constrain) -> {
 						if (constrain.pointA != particle && constrain.pointB != particle && !constrain.broken) {
-							Contact contact = checkContact(particle, constrain);
+							Contact2d contact = checkContact(particle, constrain);
 							if (contact.isCollision()) collisions.put(contact, shape2);
 						}
 					}));
@@ -109,7 +108,7 @@ public class PhysicSolver {
 				collisions.keySet().forEach((collision) -> {
 					if (this.world.getContactListener().beginContact(collision)) {
 						boolean processCollision = true;
-						SoftBody shape2 = collisions.get(collision);
+						SoftBody2d shape2 = collisions.get(collision);
 						if (shape == shape2) {
 							if (!shape.getContactListener().beginContact(collision)) processCollision = false;
 						} else {
@@ -128,7 +127,7 @@ public class PhysicSolver {
 			
 			// Accumulate Global Forces
 			shape.getParticles().forEach((point) -> {
-				point.acceleration = new Vec3d(world.getGlobalForce());
+				point.acceleration = new Vec2d(world.getGlobalForce());
 			});
 			
 		});
@@ -140,17 +139,17 @@ public class PhysicSolver {
 	 * @param itteration The number of the iteration, used to calculate the strength of the "reform-force", higher number -> less strength
 	 * @param constrain The Constrain to reform
 	 */
-	public void constrain(int itteration, Constrain constrain) {
+	public void constrain(int itteration, Constrain2d constrain) {
 		
 		// Calculate force on the constrain
-		Vec3d forceA = constrain.pointA.getMotion().mul(constrain.pointA.mass);
-		Vec3d forceB = constrain.pointB.getMotion().mul(constrain.pointA.mass);
-		Vec2d angle = constrain.pointA.pos.angle(constrain.pointB.pos);
-		double force = forceA.forceByAngle(angle).add(forceB.forceByAngle(new Vec2d(angle.x + Math.PI, angle.y + Math.PI))).summ();
+		Vec2d forceA = constrain.pointA.getMotion().mul(constrain.pointA.mass);
+		Vec2d forceB = constrain.pointB.getMotion().mul(constrain.pointA.mass);
+		double angle = constrain.pointA.pos.angle(constrain.pointB.pos);
+		double force = forceA.forceByAngle(angle).add(forceB.forceByAngle(angle + Math.PI)).summ();
 		force = (force < 0 ? -force : force);
 		
 		// Calculate spring deformation
-		Vec3d delta = constrain.pointB.pos.sub(constrain.pointA.pos);
+		Vec2d delta = constrain.pointB.pos.sub(constrain.pointA.pos);
 		double deltalength = Math.sqrt(delta.dot(delta));
 		double diff = (deltalength - constrain.length) / deltalength;
 		
@@ -174,8 +173,8 @@ public class PhysicSolver {
 	 * @param deltaT The size of the simulation-step, larger steps make the simulation faster, but less accurate 
 	 * @param point The Particle to integrate
 	 */
-	public void integrate(float deltaT, Particle point) {
-		Vec3d temp = point.pos;
+	public void integrate(float deltaT, Particle2d point) {
+		Vec2d temp = point.pos;
 		point.pos = point.pos.add(point.pos.sub(point.lastPos).add(point.acceleration.mul(deltaT * deltaT)));
 		point.lastPos = temp;
 	}
@@ -186,34 +185,30 @@ public class PhysicSolver {
 	 * @param constrain The Constrain
 	 * @return A Contact representing the collision between the two instances, its variables are null if there is no collision
 	 */
-	public Contact checkContact(Particle particle, Constrain constrain) {
+	public Contact2d checkContact(Particle2d particle, Constrain2d constrain) {
 		
-		return Contact.noContact();
+		// Phase 1 check: Vector (infinity line) intersectioncheck
+		Vec2d line1a = constrain.pointA.pos;
+		Vec2d line1b = constrain.pointB.pos;
+		Vec2d line2a = particle.pos;
+		Vec2d line2b = particle.lastPos;
+		double denom =	(line2b.y - line2a.y) * (line1b.x - line1a.x) - (line2b.x - line2a.x) * (line1b.y - line1a.y);
+		if (Math.abs(denom) < 0.000000008) return Contact2d.noContact();
 		
-//		// Phase 1 check: Vector (infinity line) intersection check
-//		Vec3d line1a = constrain.pointA.pos;
-//		Vec3d line1b = constrain.pointB.pos;
-//		Vec3d line2a = particle.pos;
-//		Vec3d line2b = particle.lastPos;
-//		double denom =	(line2b.y - line2a.y) * (line1b.x - line1a.x) - (line2b.x - line2a.x) * (line1b.y - line1a.y);
-//		
-//		
-//		if (Math.abs(denom) < 0.000000008) return Contact.noContact();
-//		
-//		// Phase 2 check: Line intersection check
-//		double ua = ((line2b.x - line2a.x) * (line1a.y - line2a.y) - (line2b.y - line2a.y) * (line1a.x - line2a.x)) / denom;
-//		double ub = ((line1b.x - line1a.x) * (line1a.y - line2a.y) - (line1b.y - line1a.y) * (line1a.x - line2a.x)) / denom;
-//		if (!(ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)) return Contact.noContact();
-//		
-//		// Calculate nearest point on constrain
-//		Vec2d v = line1b.sub(line1a);
-//		Vec2d w = particle.pos.sub(line1a);
-//		double b = w.dot(v) / v.dot(v);
-//		Vec2d nearestOnConstrain = line1a.add(v.mul(b));
-//		
-//		double collisionDepth = particle.pos.distance(nearestOnConstrain);
-//		Vec2d collisionNormal = particle.pos.noramlVec(nearestOnConstrain);
-//		return Contact.contact(collisionNormal, collisionDepth, particle, constrain);
+		// Phase 2 check: Line intersection check
+		double ua = ((line2b.x - line2a.x) * (line1a.y - line2a.y) - (line2b.y - line2a.y) * (line1a.x - line2a.x)) / denom;
+		double ub = ((line1b.x - line1a.x) * (line1a.y - line2a.y) - (line1b.y - line1a.y) * (line1a.x - line2a.x)) / denom;
+		if (!(ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)) return Contact2d.noContact();
+		
+		// Calculate nearest point on constrain
+		Vec2d v = line1b.sub(line1a);
+		Vec2d w = particle.pos.sub(line1a);
+		double b = w.dot(v) / v.dot(v);
+		Vec2d nearestOnConstrain = line1a.add(v.mul(b));
+		
+		double collisionDepth = particle.pos.distance(nearestOnConstrain);
+		Vec2d collisionNormal = particle.pos.noramlVec(nearestOnConstrain);
+		return Contact2d.contact(collisionNormal, collisionDepth, particle, constrain);
 		
 	};
 	
@@ -222,13 +217,13 @@ public class PhysicSolver {
 	 * @param contact The Contact that represents the collision
 	 * @throws A RuntimeException of an IllegalStateException if the given Contact is not a collision
 	 */
-	public void solveCollision(Contact contact) {
+	public void solveCollision(Contact2d contact) {
 		
 		if (!contact.isCollision()) throw new RuntimeException(new IllegalStateException("Can not handle non-collision Contact instance!"));
 		
-		Particle particle1 = contact.getParticle();
-		Particle particle2A = contact.getConstrain().pointA;
-		Particle particle2B = contact.getConstrain().pointB;
+		Particle2d particle1 = contact.getParticle();
+		Particle2d particle2A = contact.getConstrain().pointA;
+		Particle2d particle2B = contact.getConstrain().pointB;
 		
 		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
 		
