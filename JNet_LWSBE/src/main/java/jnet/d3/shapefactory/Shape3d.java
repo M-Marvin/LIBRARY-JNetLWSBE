@@ -5,6 +5,7 @@ import java.util.List;
 
 import jnet.JNet;
 import jnet.d3.physic.SoftBody3d;
+import jnet.d3.physic.SoftBody3d.CollisionPlane3d;
 import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.physic.SoftBody3d.Particle3d;
 import jnet.util.Material;
@@ -17,12 +18,25 @@ import jnet.util.Vec3d;
  */
 public class Shape3d {
 	
+	protected List<CollisionPlaneDefinition3d> planes;
 	protected List<ConstrainDefinition3d> constrains;
 	protected List<ParticleDefinition3d> particles;
 	
 	public Shape3d() {
+		this.planes = new ArrayList<CollisionPlaneDefinition3d>();
 		this.constrains = new ArrayList<ConstrainDefinition3d>();
 		this.particles = new ArrayList<ParticleDefinition3d>();
+	}
+	
+	/**
+	 * Adds the CollisionPlane and (if not already added) its Constrains to this SoftBody
+	 * @param constrain The Constrain to add
+	 */
+	public void addPlane(CollisionPlaneDefinition3d plane) {
+		this.planes.add(plane);
+		if (!this.constrains.contains(plane.constrainA)) addConstrain(plane.constrainA);
+		if (!this.constrains.contains(plane.constrainB)) addConstrain(plane.constrainB);
+		if (!this.constrains.contains(plane.constrainC)) addConstrain(plane.constrainC);
 	}
 	
 	/**
@@ -121,6 +135,56 @@ public class Shape3d {
 	
 	/** ##########################################################**/
 	
+	public static class CollisionPlaneDefinition3d {
+		
+		public ConstrainDefinition3d constrainA = new ConstrainDefinition3d(); // Only for the equals check
+		public ConstrainDefinition3d constrainB = new ConstrainDefinition3d(); // Only for the equals check
+		public ConstrainDefinition3d constrainC = new ConstrainDefinition3d(); // Only for the equals check
+
+		public CollisionPlane3d lastBuild;
+		
+		public CollisionPlaneDefinition3d() {}
+		
+		public CollisionPlaneDefinition3d(ConstrainDefinition3d constrainA, ConstrainDefinition3d constrainB, ConstrainDefinition3d constrainC) {
+			this.constrainA = constrainA;
+			this.constrainB = constrainB;
+			this.constrainC = constrainC;
+		}
+
+		/**
+		 * Like the method of the CollisionPlane, changes the material-property of the plane definition and its constrain definitions
+		 * @param material The new material-info
+		 */
+		public void changeMaterial(Material material) {
+			this.constrainA.changeMaterial(material);
+			this.constrainB.changeMaterial(material);
+			this.constrainC.changeMaterial(material);
+		}
+
+		/**
+		 * Creates a new instance of CollisionPlane with this parameters
+		 * IMPORTANT: Build the ConstrainDefinitions first!
+		 * @return A new CollisionPlane with the parameters of this definition
+		 * @throws RuntimeException of a IllegalStateException when the used ConstrainDefinitions are not build
+		 */
+		public CollisionPlane3d build() {
+			if (this.constrainA.lastBuild == null || this.constrainB.lastBuild == null || this.constrainC.lastBuild == null) throw new RuntimeException(new IllegalStateException("Cant build CollisionPlane before the Constrains are build!"));
+			this.lastBuild = new CollisionPlane3d(this);
+			return this.lastBuild;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof CollisionPlaneDefinition3d) {
+				return	((CollisionPlaneDefinition3d) obj).constrainA.equals(this.constrainA) &&
+						((CollisionPlaneDefinition3d) obj).constrainB.equals(this.constrainB) &&
+						((CollisionPlaneDefinition3d) obj).constrainC.equals(this.constrainC);
+			}
+			return false;
+		}
+		
+	}
+	
 	public static class ConstrainDefinition3d {
 		
 		public ParticleDefinition3d pointA = new ParticleDefinition3d(); // Only for the equals check
@@ -128,6 +192,8 @@ public class Shape3d {
 		public float stiffness;
 		public float deformForce;
 		public float maxBending;
+		
+		public Constrain3d lastBuild;
 		
 		public ConstrainDefinition3d() {}
 		
@@ -157,7 +223,8 @@ public class Shape3d {
 		 */
 		public Constrain3d build() {
 			if (this.pointA.lastBuild == null || this.pointB.lastBuild == null) throw new RuntimeException(new IllegalStateException("Cant build Constrain bevore the Particles are not build!"));
-			return new Constrain3d(this);
+			this.lastBuild = new Constrain3d(this);
+			return this.lastBuild;
 		}
 		
 		@Override
@@ -187,6 +254,7 @@ public class Shape3d {
 			this.pos = pos;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
+		
 		/**
 		 * Like the method of the Particle, changes the material-property of the definition
 		 * @param material The new material-info

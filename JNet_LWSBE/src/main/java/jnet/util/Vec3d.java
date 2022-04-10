@@ -120,4 +120,20 @@ public class Vec3d implements IVector3D<Double> {
 		return velocity.div(velocity.summ());
 	}
 	
+	public Vec3d cross(Vec3d vec) {
+		return new Vec3d(
+				this.y * vec.z - this.z * vec.y,
+				this.z * vec.x - this.x * vec.z,
+				this.x * vec.y - this.y * vec.x
+			);
+	}
+
+	public double length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	}
+	
+	public double lengthSqr() {
+		return this.x * this.x + this.y * this.y + this.z * this.z;
+	}
+	
 }

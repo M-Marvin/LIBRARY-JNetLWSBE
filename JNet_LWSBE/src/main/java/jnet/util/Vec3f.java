@@ -74,21 +74,23 @@ public class Vec3f implements IVector3D<Float> {
 		double distXY = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 		return Math.sqrt(distXY * distXY + distanceZ * distanceZ);		
 	}
+
+	public Vec2d angle(Vec3f v2) {
+		double distX = v2.x - x;
+		double distY = v2.y - y;
+		double distZ = v2.z - z;
+		double angleXY = Math.atan(distX / distY);
+		double distXY = Math.sqrt(distX * distX + distY * distY);
+		double angleZ = Math.atan(distZ / distXY);
+		return new Vec2d(angleXY, angleZ);
+	}
 	
-//	public double angle(Vec3f v2) {
-//		double distX = v2.x - x;
-//		double distY = v2.y - y;
-//		// TODO
-//		return Math.atan(distX / distY);
-//	}
-//	
-//	public Vec3f forceByAngle(float angle) {
-//		float fx = Math.sin(angle) * x;
-//		float fy = Math.cos(angle) * y;
-//		// TODO
-//		return new Vec3f(fx, fy, 0);
-//		
-//	}
+	public Vec3d forceByAngle(Vec2f angle) {
+		double fx =  Math.sin(angle.y) * Math.sin(angle.x) * x;
+		double fy =  Math.sin(angle.y) * Math.cos(angle.x) * y;
+		double fz = Math.sin(angle.y) * z;
+		return new Vec3d(fx, fy, fz);
+	}
 	
 	public float summ() {
 		return Math.abs(x) + Math.abs(y) + Math.abs(z);
@@ -115,6 +117,22 @@ public class Vec3f implements IVector3D<Float> {
 	public Vec3f noramlVec(Vec3f target) {
 		Vec3f velocity = target.sub(this);
 		return velocity.div(velocity.summ());
+	}
+
+	public Vec3d cross(Vec3f vec) {
+		return new Vec3d(
+				this.y * vec.z - this.z * vec.y,
+				this.z * vec.x - this.x * vec.z,
+				this.x * vec.y - this.y * vec.x
+			);
+	}
+
+	public double length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	}
+	
+	public double lengthSqr() {
+		return this.x * this.x + this.y * this.y + this.z * this.z;
 	}
 	
 }

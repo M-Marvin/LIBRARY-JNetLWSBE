@@ -103,5 +103,13 @@ public class Vec2f implements IVector2D<Float> {
 		Vec2f velocity = target.sub(this);
 		return velocity.div(velocity.summ());
 	}
+
+	public double length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	
+	public double lengthSqr() {
+		return this.x * this.x + this.y * this.y;
+	}
 	
 }

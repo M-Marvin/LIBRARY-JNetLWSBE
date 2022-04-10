@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.management.RuntimeErrorException;
 
 import jnet.JNet;
+import jnet.d3.physic.SoftBody3d.CollisionPlane3d;
 import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.physic.SoftBody3d.Particle3d;
 import jnet.util.Vec2d;
@@ -97,9 +98,9 @@ public class PhysicSolver3d {
 				// Check Constrain-collisions
 				HashMap<Contact3d, SoftBody3d> collisions = new HashMap<Contact3d, SoftBody3d>();
 				shape.getParticles().forEach((particle) -> {
-					this.world.getSoftBodys().forEach((shape2) -> shape2.getConstrains().forEach((constrain) -> {
-						if (constrain.pointA != particle && constrain.pointB != particle && !constrain.broken) {
-							Contact3d contact = checkContact(particle, constrain);
+					this.world.getSoftBodys().forEach((shape2) -> shape2.getPlanes().forEach((plane) -> {
+						if (plane.particleA != particle && plane.particleB != particle && plane.particleC != particle && !plane.isBroken()) {
+							Contact3d contact = checkContact(particle, plane);
 							if (contact.isCollision()) collisions.put(contact, shape2);
 						}
 					}));
@@ -186,9 +187,69 @@ public class PhysicSolver3d {
 	 * @param constrain The Constrain
 	 * @return A Contact representing the collision between the two instances, its variables are null if there is no collision
 	 */
-	public Contact3d checkContact(Particle3d particle, Constrain3d constrain) {
+	public Contact3d checkContact(Particle3d particle, CollisionPlane3d plane) {
 		
-		return Contact3d.noContact();
+		Vec3d v0 = plane.particleA.pos;
+		Vec3d v1 = plane.particleB.pos;
+		Vec3d v2 = plane.particleC.pos;
+		
+		// Make ray from particle motion
+		Vec3d orig = particle.lastPos;
+		Vec3d dir = particle.lastPos.sub(particle.pos).normalize();
+		
+		//double t = 01010101F; // ????
+		float tol = 0.0000008F; // kEpsi...
+		double t = tol;
+		
+		// compute plane's normal
+		Vec3d v0v1 = v1.sub(v0);
+		Vec3d v0v2 = v2.sub(v0);
+		Vec3d N = v0v1.cross(v0v2);
+		double area2 = N.length();
+		
+		
+		
+		// Step 1: finding P
+			 
+		// check if ray and plane are parallel ?
+		double NdotRayDirection = N.dot(dir); 
+		if (Math.abs(NdotRayDirection) < tol) return Contact3d.noContact(); // they are parallel so they don't intersect ! 
+		
+		
+		double d = N.mul(-1).dot(v0); 
+		t = -(N.dot(orig) + d) / NdotRayDirection; 
+		
+		// check if the triangle is in behind the ray
+		if (t < 0) return Contact3d.noContact(); // the triangle is behind 
+		
+		// compute the intersection point using equation 1
+		Vec3d P = orig.add(dir.mul(t)); 
+		
+		// Step 2: inside-outside test
+		Vec3d C; // vector perpendicular to triangle's plane 
+		
+		// edge 0
+		Vec3d edge0 = v1.sub(v0); 
+		Vec3d vp0 = P.sub(v0); 
+		C = edge0.cross(vp0); 
+		if (N.dot(C) < 0) return Contact3d.noContact(); // P is on the right side 
+		
+		// edge 1
+		Vec3d edge1 = v2.sub(v1); 
+		Vec3d vp1 = P.sub(v1); 
+		C = edge1.cross(vp1); 
+		if (N.dot(C) < 0)  return Contact3d.noContact(); // P is on the right side 
+		
+		// edge 2
+		Vec3d edge2 = v0.sub(v2); 
+		Vec3d vp2 = P.sub(v2); 
+		C = edge2.cross(vp2); 
+		if (N.dot(C) < 0) return Contact3d.noContact(); // P is on the right side; 
+		
+		
+		Vec3d collisionNormal = particle.pos.noramlVec(P);
+		double collisionDepth = particle.pos.distance(P);
+		return Contact3d.contact(collisionNormal, collisionDepth, particle, plane);
 		
 //		// Phase 1 check: Vector (infinity line) intersection check
 //		Vec3d line1a = constrain.pointA.pos;
@@ -226,19 +287,21 @@ public class PhysicSolver3d {
 		
 		if (!contact.isCollision()) throw new RuntimeException(new IllegalStateException("Can not handle non-collision Contact instance!"));
 		
-		Particle3d particle1 = contact.getParticle();
-		Particle3d particle2A = contact.getConstrain().pointA;
-		Particle3d particle2B = contact.getConstrain().pointB;
+		System.out.println("COLLISION");
 		
-		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
-		
-		double distA = particle1.pos.distance(particle2A.pos);
-		double distB = particle1.pos.distance(particle2B.pos);
-		double ca = distA / (distA + distB);
-		double cb = distB / (distA + distB);
-		
-		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb / 1.9F));
-		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca / 1.9F));
+//		Particle3d particle1 = contact.getParticle();
+//		Particle3d particle2A = contact.getConstrain().pointA;
+//		Particle3d particle2B = contact.getConstrain().pointB;
+//		
+//		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
+//		
+//		double distA = particle1.pos.distance(particle2A.pos);
+//		double distB = particle1.pos.distance(particle2B.pos);
+//		double ca = distA / (distA + distB);
+//		double cb = distB / (distA + distB);
+//		
+//		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb / 1.9F));
+//		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca / 1.9F));
 		
 	}
 	

@@ -1,5 +1,6 @@
 package jnet.d3.physic;
 
+import jnet.d3.physic.SoftBody3d.CollisionPlane3d;
 import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.physic.SoftBody3d.Particle3d;
 import jnet.util.Vec3d;
@@ -14,7 +15,7 @@ public class Contact3d {
 	protected Vec3d collisionNormal;
 	protected double collisionDepth;
 	protected Particle3d particle;
-	protected Constrain3d constrain;
+	protected CollisionPlane3d plane;
 	
 	protected Contact3d() {}
 	
@@ -34,10 +35,10 @@ public class Contact3d {
 	 * @param constrain The Constrain of the collision
 	 * @return A new Contact instance
 	 */
-	public static Contact3d contact(Vec3d collisionNormal, double collisionDepth, Particle3d particle, Constrain3d constrain) {
+	public static Contact3d contact(Vec3d collisionNormal, double collisionDepth, Particle3d particle, CollisionPlane3d plane) {
 		Contact3d contact = new Contact3d();
 		contact.particle = particle;
-		contact.constrain = constrain;
+		contact.plane = plane;
 		contact.collisionDepth = collisionDepth;
 		contact.collisionNormal = collisionNormal;
 		return contact;
@@ -79,8 +80,8 @@ public class Contact3d {
 	 * Ge5ts the Constrain of the collision
 	 * @return The Constrain of the collision
 	 */
-	public Constrain3d getConstrain() {
-		return constrain;
+	public CollisionPlane3d getConstrain() {
+		return plane;
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
+import jnet.d3.shapefactory.Shape3d.CollisionPlaneDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ConstrainDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ParticleDefinition3d;
 import jnet.util.Material;
@@ -16,6 +17,7 @@ import jnet.util.Vec3d;
  */
 public class SoftBody3d {
 	
+	protected List<CollisionPlane3d> planes;
 	protected List<Constrain3d> constrains;
 	protected List<Particle3d> particles;
 	protected ContactListener3d contactListener;
@@ -25,6 +27,7 @@ public class SoftBody3d {
 	 * @param body The SoftBody to create a clone instance
 	 */
 	public SoftBody3d(SoftBody3d body) {
+		this.planes = body.planes;
 		this.constrains = body.constrains;
 		this.particles = body.particles;
 		this.contactListener = new ContactListener3d.DummyListener();
@@ -34,9 +37,21 @@ public class SoftBody3d {
 	 * Creates a empty SoftBody, Constrains and its Particles can be added manually.
 	 */
 	public SoftBody3d() {
+		this.planes = new ArrayList<CollisionPlane3d>();
 		this.constrains = new ArrayList<Constrain3d>();
 		this.particles = new ArrayList<Particle3d>();
 		this.contactListener = new ContactListener3d.DummyListener();
+	}
+
+	/**
+	 * Adds the CollisionPlane and (if not already added) its Constrains to this SoftBody
+	 * @param constrain The Constrain to add
+	 */
+	public void addPlane(CollisionPlane3d plane) {
+		this.planes.add(plane);
+		if (!this.constrains.contains(plane.constrainA)) addConstrain(plane.constrainA);
+		if (!this.constrains.contains(plane.constrainB)) addConstrain(plane.constrainB);
+		if (!this.constrains.contains(plane.constrainC)) addConstrain(plane.constrainC);
 	}
 	
 	/**
@@ -55,6 +70,10 @@ public class SoftBody3d {
 	 */
 	public void changeMaterial(Material material) {
 		this.constrains.forEach((constrain) -> constrain.changeMaterial(material));
+	}
+	
+	public List<CollisionPlane3d> getPlanes() {
+		return planes;
 	}
 	
 	public List<Constrain3d> getConstrains() {
@@ -83,6 +102,62 @@ public class SoftBody3d {
 	
 	public ContactListener3d getContactListener() {
 		return contactListener;
+	}
+	
+	public static class CollisionPlane3d {
+		
+		public Constrain3d constrainA;
+		public Constrain3d constrainB;
+		public Constrain3d constrainC;
+		public Particle3d particleA;
+		public Particle3d particleB;
+		public Particle3d particleC;
+
+		/**
+		 * Construct CollisionPlane using CollisionPlaneDefinition
+		 * @param definition Definition for this CollisionPlane
+		 */
+		public CollisionPlane3d(CollisionPlaneDefinition3d definition) {
+			this.constrainA = definition.constrainA.lastBuild;
+			this.constrainB = definition.constrainB.lastBuild;
+			this.constrainC = definition.constrainC.lastBuild;
+			this.particleA = constrainA.pointA;
+			this.particleB = constrainB.pointA.equals(particleA) ? constrainB.pointB : constrainB.pointA;
+			this.particleC = (constrainC.pointA.equals(particleA) || constrainC.pointA.equals(particleB)) ? constrainC.pointB : constrainC.pointA;
+		}
+		
+		/***
+		 * Construct CollisionPlane using Constrains
+		 * @param constrainA Constrain A of the CollisionPlane
+		 * @param constrainB Constrain B of the CollisionPlane
+		 * @param constrainC Constrain C of the CollisionPlane
+		 */
+		public CollisionPlane3d(Constrain3d constrainA, Constrain3d constrainB, Constrain3d constrainC) {
+			this.constrainA = constrainA;
+			this.constrainB = constrainB;
+			this.constrainC = constrainC;
+			this.particleA = constrainA.pointA;
+			this.particleB = constrainB.pointA.equals(particleA) ? constrainB.pointB : constrainB.pointA;
+			this.particleC = (constrainC.pointA.equals(particleA) || constrainC.pointA.equals(particleB)) ? constrainC.pointB : constrainC.pointA;
+		}
+
+		/**
+		 * Checks if one of the Constrains is broken, if so, this CollisionPlane has no collision effects.
+		 */
+		public boolean isBroken() {
+			return constrainA.broken || constrainB.broken || constrainC.broken;
+		}
+
+		/**
+		 * Manually changes the material-property of the CollisionPlane and its Constrain with the given combined Material-Info
+		 * @param material The Material-Info with the new material-property
+		 */
+		public void changeMaterial(Material material) {
+			this.constrainA.changeMaterial(material);
+			this.constrainB.changeMaterial(material);
+			this.constrainC.changeMaterial(material);
+		}
+		
 	}
 	
 	public static class Constrain3d {
