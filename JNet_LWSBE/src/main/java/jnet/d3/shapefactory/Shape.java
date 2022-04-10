@@ -1,13 +1,13 @@
-package jnet.shapefactory;
+package jnet.d3.shapefactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.physic.SoftBody;
-import jnet.physic.SoftBody.Constrain;
-import jnet.physic.SoftBody.Particle;
-import jnet.util.Vec2d;
+import jnet.d3.physic.SoftBody;
+import jnet.d3.physic.SoftBody.Constrain;
+import jnet.d3.physic.SoftBody.Particle;
+import jnet.util.Vec3d;
 
 /**
  * The Shape is like a Definition of a SoftBody, it can produce multiple identical SoftBodys.
@@ -63,8 +63,8 @@ public class Shape {
 	 * @param y The y position of the ParticleDefinition
 	 * @return The first matching ParticleDefinition or null if no one is found
 	 */
-	public ParticleDefinition searchNode(float x, float y) {
-		Vec2d position = new Vec2d(x, y);
+	public ParticleDefinition searchNode(float x, float y, float z) {
+		Vec3d position = new Vec3d(x, y, z);
 		for (ParticleDefinition node : this.particles) {
 			if (node.pos.equals(position)) return node;
 		}
@@ -75,7 +75,7 @@ public class Shape {
 	 * @param position The position of the ParticleDefinition
 	 * @return The first matching ParticleDefinition or null if no one is found
 	 */
-	public ParticleDefinition searchNode(Vec2d position) {
+	public ParticleDefinition searchNode(Vec3d position) {
 		for (ParticleDefinition node : this.particles) {
 			if (node.pos.equals(position)) return node;
 		}
@@ -88,7 +88,7 @@ public class Shape {
 	 * @param position2 The position of the second ParticleDefinition
 	 * @return The first matching ConstrainDefinition or null if no one is found
 	 */
-	public ConstrainDefinition searchBeam(Vec2d position1, Vec2d position2) {
+	public ConstrainDefinition searchBeam(Vec3d position1, Vec3d position2) {
 		ParticleDefinition node1 = searchNode(position1);
 		if (node1 == null) return null;
 		ParticleDefinition node2 = searchNode(position2);
@@ -107,10 +107,10 @@ public class Shape {
 	 * @param y2 The y position of the second ParticleDefinition
 	 * @return The first matching ConstrainDefinition or null if no one is found
 	 */
-	public ConstrainDefinition searchBeam(float x1, float y1, float x2, float y2) {
-		ParticleDefinition node1 = searchNode(x1, y1);
+	public ConstrainDefinition searchBeam(float x1, float y1, float z1, float x2, float y2, float z2) {
+		ParticleDefinition node1 = searchNode(x1, y1, z1);
 		if (node1 == null) return null;
-		ParticleDefinition node2 = searchNode(x2, y2);
+		ParticleDefinition node2 = searchNode(x2, y2, z1);
 		if (node2 == null) return null;
 		for (ConstrainDefinition beam : this.constrains) {
 			if ((beam.pointA.equals(node1) && beam.pointB.equals(node2)) || (beam.pointA.equals(node2) && beam.pointB.equals(node1))) return beam;
@@ -175,14 +175,14 @@ public class Shape {
 	
 	public static class ParticleDefinition {
 		
-		public Vec2d pos = new Vec2d();
+		public Vec3d pos = new Vec3d();
 		public float mass;
 		
 		public Particle lastBuild;
 		
 		public ParticleDefinition() {}
 		
-		public ParticleDefinition(Vec2d pos) {
+		public ParticleDefinition(Vec3d pos) {
 			this.pos = pos;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}

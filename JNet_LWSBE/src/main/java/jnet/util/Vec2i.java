@@ -1,6 +1,6 @@
 package jnet.util;
 
-public class Vec2i implements IVector<Integer> {
+public class Vec2i implements IVector2<Integer> {
 	
 	public int x;
 	public int y;
@@ -25,25 +25,25 @@ public class Vec2i implements IVector<Integer> {
 		this.y = y;
 	}
 	
-	public Vec2i(IVector<? extends Number> v) {
+	public Vec2i(IVector2<? extends Number> v) {
 		this.x = (Integer) v.getVecX();
 		this.y = (Integer) v.getVecY();	
 	}
 	
-	public Vec2i mul(Vec2i v2) {
-		return new Vec2i(x * v2.x, y * v2.y);
+	public Vec2f mul(Vec2i v2) {
+		return new Vec2f(x * v2.x, y * v2.y);
 	}
 	
-	public Vec2i mul(int scale) {
-		return new Vec2i(x * scale, y * scale);
+	public Vec2f mul(int scale) {
+		return new Vec2f(x * scale, y * scale);
 	}
 	
-	public Vec2i div(Vec2i v2) {
-		return new Vec2i(x / v2.x, y / v2.y);
+	public Vec2f div(Vec2i v2) {
+		return new Vec2f(x / v2.x, y / v2.y);
 	}
 	
-	public Vec2i div(int scale) {
-		return new Vec2i(x / scale, y / scale);
+	public Vec2f div(float scale) {
+		return new Vec2f(x / scale, y / scale);
 	}
 	
 	public Vec2i add(Vec2i v2) {
@@ -54,14 +54,14 @@ public class Vec2i implements IVector<Integer> {
 		return new Vec2i(x - v2.x, y - v2.y);
 	}
 	
-	public int dot(Vec2i v2) {
+	public float dot(Vec2i v2) {
 		return x * v2.x + y * v2.y;
 	}
 
-	public int distance(Vec2i v2) {
-		int distanceX = Math.max(x, v2.x) - Math.min(x, v2.x);
-		int distanceY = Math.max(y, v2.y) - Math.min(y, v2.y);
-		return (int) Math.sqrt(distanceX * distanceX + distanceY * distanceY);		
+	public float distance(Vec2i v2) {
+		float distanceX = Math.max(x, v2.x) - Math.min(x, v2.x);
+		float distanceY = Math.max(y, v2.y) - Math.min(y, v2.y);
+		return (float) Math.sqrt(distanceX * distanceX + distanceY * distanceY);		
 	}
 	
 	public int angle(Vec2i v2) {
@@ -94,12 +94,12 @@ public class Vec2i implements IVector<Integer> {
 		return "|" + x + "," + y + "|";
 	}
 
-	public Vec2i normalize() {
-		int magnitude = (int) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-		return this.div(magnitude);
+	public Vec2f normalize() {
+		double magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		return this.div((float) magnitude);
 	}
 
-	public Vec2i noramlVec(Vec2i target) {
+	public Vec2f noramlVec(Vec2i target) {
 		Vec2i velocity = target.sub(this);
 		return velocity.div(velocity.summ());
 	}

@@ -1,13 +1,14 @@
-package jnet.physic;
+package jnet.d3.physic;
 
 import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
 import jnet.JNet;
-import jnet.physic.SoftBody.Constrain;
-import jnet.physic.SoftBody.Particle;
+import jnet.d3.physic.SoftBody.Constrain;
+import jnet.d3.physic.SoftBody.Particle;
 import jnet.util.Vec2d;
+import jnet.util.Vec3d;
 
 /**
  * The core of the PhysicEngine, the solver handles the forces on the Particles, the movement, the collisions and the constrains.
@@ -127,7 +128,7 @@ public class PhysicSolver {
 			
 			// Accumulate Global Forces
 			shape.getParticles().forEach((point) -> {
-				point.acceleration = new Vec2d(world.getGlobalForce());
+				point.acceleration = new Vec3d(world.getGlobalForce());
 			});
 			
 		});
@@ -142,14 +143,14 @@ public class PhysicSolver {
 	public void constrain(int itteration, Constrain constrain) {
 		
 		// Calculate force on the constrain
-		Vec2d forceA = constrain.pointA.getMotion().mul(constrain.pointA.mass);
-		Vec2d forceB = constrain.pointB.getMotion().mul(constrain.pointA.mass);
-		double angle = constrain.pointA.pos.angle(constrain.pointB.pos);
-		double force = forceA.forceByAngle(angle).add(forceB.forceByAngle(angle + Math.PI)).summ();
+		Vec3d forceA = constrain.pointA.getMotion().mul(constrain.pointA.mass);
+		Vec3d forceB = constrain.pointB.getMotion().mul(constrain.pointA.mass);
+		Vec2d angle = constrain.pointA.pos.angle(constrain.pointB.pos);
+		double force = forceA.forceByAngle(angle).add(forceB.forceByAngle(new Vec2d(angle.x + Math.PI, angle.y + Math.PI))).summ();
 		force = (force < 0 ? -force : force);
 		
 		// Calculate spring deformation
-		Vec2d delta = constrain.pointB.pos.sub(constrain.pointA.pos);
+		Vec3d delta = constrain.pointB.pos.sub(constrain.pointA.pos);
 		double deltalength = Math.sqrt(delta.dot(delta));
 		double diff = (deltalength - constrain.length) / deltalength;
 		
@@ -174,7 +175,7 @@ public class PhysicSolver {
 	 * @param point The Particle to integrate
 	 */
 	public void integrate(float deltaT, Particle point) {
-		Vec2d temp = point.pos;
+		Vec3d temp = point.pos;
 		point.pos = point.pos.add(point.pos.sub(point.lastPos).add(point.acceleration.mul(deltaT * deltaT)));
 		point.lastPos = temp;
 	}
@@ -187,28 +188,32 @@ public class PhysicSolver {
 	 */
 	public Contact checkContact(Particle particle, Constrain constrain) {
 		
-		// Phase 1 check: Vector (infinity line) intersectioncheck
-		Vec2d line1a = constrain.pointA.pos;
-		Vec2d line1b = constrain.pointB.pos;
-		Vec2d line2a = particle.pos;
-		Vec2d line2b = particle.lastPos;
-		double denom =	(line2b.y - line2a.y) * (line1b.x - line1a.x) - (line2b.x - line2a.x) * (line1b.y - line1a.y);
-		if (Math.abs(denom) < 0.000000008) return Contact.noContact();
+		return Contact.noContact();
 		
-		// Phase 2 check: Line intersection check
-		double ua = ((line2b.x - line2a.x) * (line1a.y - line2a.y) - (line2b.y - line2a.y) * (line1a.x - line2a.x)) / denom;
-		double ub = ((line1b.x - line1a.x) * (line1a.y - line2a.y) - (line1b.y - line1a.y) * (line1a.x - line2a.x)) / denom;
-		if (!(ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)) return Contact.noContact();
-		
-		// Calculate nearest point on constrain
-		Vec2d v = line1b.sub(line1a);
-		Vec2d w = particle.pos.sub(line1a);
-		double b = w.dot(v) / v.dot(v);
-		Vec2d nearestOnConstrain = line1a.add(v.mul(b));
-		
-		double collisionDepth = particle.pos.distance(nearestOnConstrain);
-		Vec2d collisionNormal = particle.pos.noramlVec(nearestOnConstrain);
-		return Contact.contact(collisionNormal, collisionDepth, particle, constrain);
+//		// Phase 1 check: Vector (infinity line) intersection check
+//		Vec3d line1a = constrain.pointA.pos;
+//		Vec3d line1b = constrain.pointB.pos;
+//		Vec3d line2a = particle.pos;
+//		Vec3d line2b = particle.lastPos;
+//		double denom =	(line2b.y - line2a.y) * (line1b.x - line1a.x) - (line2b.x - line2a.x) * (line1b.y - line1a.y);
+//		
+//		
+//		if (Math.abs(denom) < 0.000000008) return Contact.noContact();
+//		
+//		// Phase 2 check: Line intersection check
+//		double ua = ((line2b.x - line2a.x) * (line1a.y - line2a.y) - (line2b.y - line2a.y) * (line1a.x - line2a.x)) / denom;
+//		double ub = ((line1b.x - line1a.x) * (line1a.y - line2a.y) - (line1b.y - line1a.y) * (line1a.x - line2a.x)) / denom;
+//		if (!(ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)) return Contact.noContact();
+//		
+//		// Calculate nearest point on constrain
+//		Vec2d v = line1b.sub(line1a);
+//		Vec2d w = particle.pos.sub(line1a);
+//		double b = w.dot(v) / v.dot(v);
+//		Vec2d nearestOnConstrain = line1a.add(v.mul(b));
+//		
+//		double collisionDepth = particle.pos.distance(nearestOnConstrain);
+//		Vec2d collisionNormal = particle.pos.noramlVec(nearestOnConstrain);
+//		return Contact.contact(collisionNormal, collisionDepth, particle, constrain);
 		
 	};
 	

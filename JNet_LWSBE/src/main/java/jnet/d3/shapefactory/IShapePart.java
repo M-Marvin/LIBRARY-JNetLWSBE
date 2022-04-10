@@ -1,8 +1,8 @@
-package jnet.shapefactory;
+package jnet.d3.shapefactory;
 
 import java.util.List;
 
-import jnet.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape.ConstrainDefinition;
 
 /**
  * This is the interface for making custom ShapeBuilders for the ShapeFactory.

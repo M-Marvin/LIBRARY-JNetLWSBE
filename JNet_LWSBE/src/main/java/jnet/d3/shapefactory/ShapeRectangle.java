@@ -1,12 +1,12 @@
-package jnet.shapefactory;
+package jnet.d3.shapefactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.shapefactory.Shape.ConstrainDefinition;
-import jnet.shapefactory.Shape.ParticleDefinition;
-import jnet.util.Vec2d;
+import jnet.d3.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape.ParticleDefinition;
+import jnet.util.Vec3d;
 
 /**
  * A default ShapeBuilder for a simple rectangle, with optional cross-beams for stabilization.
@@ -15,19 +15,19 @@ import jnet.util.Vec2d;
  */
 public class ShapeRectangle implements IShapePart {
 	
-	protected Vec2d va;
-	protected Vec2d vb;
+	protected Vec3d va;
+	protected Vec3d vb;
 	protected boolean stabelized;
 	protected Material material;
 	
-	public ShapeRectangle(Vec2d va, Vec2d vb, boolean stabelized) {
+	public ShapeRectangle(Vec3d va, Vec3d vb, boolean stabelized) {
 		this.va = va;
 		this.vb = vb;
 		this.stabelized = stabelized;
 		this.material = JNet.DEFAULT_MATERIAL;
 	}
 	
-	public ShapeRectangle(Vec2d va, Vec2d vb, boolean stabelized, Material material) {
+	public ShapeRectangle(Vec3d va, Vec3d vb, boolean stabelized, Material material) {
 		this.va = va;
 		this.vb = vb;
 		this.stabelized = stabelized;
@@ -50,9 +50,9 @@ public class ShapeRectangle implements IShapePart {
 		List<ConstrainDefinition> constrainDefinitions = new ArrayList<ConstrainDefinition>();
 		
 		ParticleDefinition pointA = new ParticleDefinition(va);
-		ParticleDefinition pointB = new ParticleDefinition(new Vec2d(va.x, vb.y));
+		ParticleDefinition pointB = new ParticleDefinition(new Vec3d(va.x, vb.y, vb.z));
 		ParticleDefinition pointC = new ParticleDefinition(vb);
-		ParticleDefinition pointD = new ParticleDefinition(new Vec2d(vb.x, va.y));
+		ParticleDefinition pointD = new ParticleDefinition(new Vec3d(vb.x, va.y, va.z));
 		
 		constrainDefinitions.add(new ConstrainDefinition(pointA, pointB));
 		constrainDefinitions.get(constrainDefinitions.size() - 1).changeMaterial(material);

@@ -1,12 +1,12 @@
-package jnet.shapefactory;
+package jnet.d3.shapefactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.shapefactory.Shape.ConstrainDefinition;
-import jnet.shapefactory.Shape.ParticleDefinition;
-import jnet.util.Vec2d;
+import jnet.d3.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape.ParticleDefinition;
+import jnet.util.Vec3d;
 
 /**
  * A default ShapeBuilder for a simple triangle.
@@ -15,19 +15,19 @@ import jnet.util.Vec2d;
  */
 public class ShapeTriangle implements IShapePart {
 	
-	protected Vec2d va;
-	protected Vec2d vb;
-	protected Vec2d vc;
+	protected Vec3d va;
+	protected Vec3d vb;
+	protected Vec3d vc;
 	protected Material material;
 	
-	public ShapeTriangle(Vec2d va, Vec2d vb, Vec2d vc) {
+	public ShapeTriangle(Vec3d va, Vec3d vb, Vec3d vc) {
 		this.va = va;
 		this.vb = vb;
 		this.vc = vc;
 		this.material = JNet.DEFAULT_MATERIAL;
 	}
 	
-	public ShapeTriangle(Vec2d va, Vec2d vb, Vec2d vc, Material material) {
+	public ShapeTriangle(Vec3d va, Vec3d vb, Vec3d vc, Material material) {
 		this.va = va;
 		this.vb = vb;
 		this.vc = vc;

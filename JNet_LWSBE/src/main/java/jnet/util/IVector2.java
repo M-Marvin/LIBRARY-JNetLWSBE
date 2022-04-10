@@ -6,7 +6,7 @@ package jnet.util;
  *
  * @param <T>
  */
-public interface IVector<T> {
+public interface IVector2<T> {
 	public T getVecX();
 	public T getVecY();
 }

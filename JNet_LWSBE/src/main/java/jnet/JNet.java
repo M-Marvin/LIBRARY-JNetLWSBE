@@ -2,11 +2,11 @@ package jnet;
 
 import java.awt.Color;
 
-import jnet.physic.PhysicSolver;
-import jnet.physic.PhysicWorld;
+import jnet.d3.physic.PhysicSolver;
+import jnet.d3.physic.PhysicWorld;
+import jnet.d3.shapefactory.Material;
+import jnet.d3.shapefactory.ShapeFactory;
 import jnet.render.ShapeBeamRenderer;
-import jnet.shapefactory.Material;
-import jnet.shapefactory.ShapeFactory;
 import jnet.util.Vec2d;
 
 /**

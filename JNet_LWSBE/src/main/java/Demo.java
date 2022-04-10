@@ -21,12 +21,12 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import jnet.JNet;
-import jnet.physic.PhysicSolver;
-import jnet.physic.PhysicWorld;
-import jnet.physic.SoftBody;
-import jnet.physic.SoftBody.Constrain;
+import jnet.d3.physic.PhysicSolver;
+import jnet.d3.physic.PhysicWorld;
+import jnet.d3.physic.SoftBody;
+import jnet.d3.physic.SoftBody.Constrain;
+import jnet.d3.shapefactory.Shape;
 import jnet.render.ShapeBeamRenderer;
-import jnet.shapefactory.Shape;
 import jnet.util.Vec2d;
 
 /**

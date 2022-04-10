@@ -1,4 +1,4 @@
-package jnet.physic;
+package jnet.d3.physic;
 
 /**
  * An abstract class to extend from that recives all collisions of the object that is bound to it (can be a SoftBody or the PhysicWorld).

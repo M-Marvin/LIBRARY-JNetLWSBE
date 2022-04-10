@@ -1,8 +1,8 @@
-package jnet.physic;
+package jnet.d3.physic;
 
-import jnet.physic.SoftBody.Constrain;
-import jnet.physic.SoftBody.Particle;
-import jnet.util.Vec2d;
+import jnet.d3.physic.SoftBody.Constrain;
+import jnet.d3.physic.SoftBody.Particle;
+import jnet.util.Vec3d;
 
 /**
  * Represents a collision between a Particle and a Constrain and the informations needed to solve it.
@@ -11,7 +11,7 @@ import jnet.util.Vec2d;
  */
 public class Contact {
 	
-	protected Vec2d collisionNormal;
+	protected Vec3d collisionNormal;
 	protected double collisionDepth;
 	protected Particle particle;
 	protected Constrain constrain;
@@ -34,7 +34,7 @@ public class Contact {
 	 * @param constrain The Constrain of the collision
 	 * @return A new Contact instance
 	 */
-	public static Contact contact(Vec2d collisionNormal, double collisionDepth, Particle particle, Constrain constrain) {
+	public static Contact contact(Vec3d collisionNormal, double collisionDepth, Particle particle, Constrain constrain) {
 		Contact contact = new Contact();
 		contact.particle = particle;
 		contact.constrain = constrain;
@@ -55,7 +55,7 @@ public class Contact {
 	 * Gets the normalized vector of the collision
 	 * @returnA normalized vector representing the collision
 	 */
-	public Vec2d getCollisionNormal() {
+	public Vec3d getCollisionNormal() {
 		return collisionNormal;
 	}
 	

@@ -1,13 +1,13 @@
-package jnet.physic;
+package jnet.d3.physic;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
-import jnet.shapefactory.Material;
-import jnet.shapefactory.Shape.ConstrainDefinition;
-import jnet.shapefactory.Shape.ParticleDefinition;
-import jnet.util.Vec2d;
+import jnet.d3.shapefactory.Material;
+import jnet.d3.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape.ParticleDefinition;
+import jnet.util.Vec3d;
 
 /**
  * The SoftBody represents a object to simulate by the PhysicSolver, it must be added to a PhysicWorld.
@@ -153,9 +153,9 @@ public class SoftBody {
 	
 	public static class Particle {
 	
-		public Vec2d pos = new Vec2d();
-		public Vec2d lastPos = new Vec2d();
-		public Vec2d acceleration = new Vec2d();
+		public Vec3d pos = new Vec3d();
+		public Vec3d lastPos = new Vec3d();
+		public Vec3d acceleration = new Vec3d();
 		public float mass;
 		
 		/**
@@ -165,7 +165,7 @@ public class SoftBody {
 		public Particle(ParticleDefinition definition) {
 			this.pos = definition.pos;
 			this.lastPos = pos;
-			this.acceleration = new Vec2d();
+			this.acceleration = new Vec3d();
 			this.mass = definition.mass;
 		}
 		
@@ -174,10 +174,10 @@ public class SoftBody {
 		 * @param pos Position of the Node
 		 * @param material Combined Material-Info
 		 */
-		public Particle(Vec2d pos, Material material) {
+		public Particle(Vec3d pos, Material material) {
 			this.pos = pos;
 			this.lastPos = pos;
-			this.acceleration = new Vec2d();
+			this.acceleration = new Vec3d();
 			this.changeMaterial(material);
 		}
 		
@@ -185,10 +185,10 @@ public class SoftBody {
 		 * Construct Particle (Node) using Position and default Material
 		 * @param pos Position of the Node
 		 */
-		public Particle(Vec2d pos) {
+		public Particle(Vec3d pos) {
 			this.pos = pos;
 			this.lastPos = pos;
-			this.acceleration = new Vec2d();
+			this.acceleration = new Vec3d();
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
 		
@@ -205,31 +205,31 @@ public class SoftBody {
 		 * @param x X position of the Particle
 		 * @param y Y position of the Particle
 		 */
-		public void setPos(double x, double y) {
-			this.setPos(new Vec2d(x, y));
+		public void setPos(double x, double y, float z) {
+			this.setPos(new Vec3d(x, y, z));
 		}
 		/**
 		 * Manually set the position of the Particle (Node)
 		 * @param pos Position of the Particle
 		 */
-		public void setPos(Vec2d pos) {
+		public void setPos(Vec3d pos) {
 			this.pos = pos;
-			this.lastPos = new Vec2d(pos);
+			this.lastPos = new Vec3d(pos);
 		}
 		
 		/**
 		 * Calculates the motion-vector for this Particle
-		 * @return A Vec2d that represents the motion of this Particle
+		 * @return A Vec3d that represents the motion of this Particle
 		 */
-		public Vec2d getMotion() {
+		public Vec3d getMotion() {
 			return this.pos.sub(this.lastPos);
 		}
 		
 		/**
 		 * Uses a motion-vector to set the new velocity
-		 * @param motion A Vec2d that represents the new motion of this Particle
+		 * @param motion A Vec3d that represents the new motion of this Particle
 		 */
-		public void setMotion(Vec2d motion) {
+		public void setMotion(Vec3d motion) {
 			this.lastPos = this.pos.sub(motion);
 		}
 			

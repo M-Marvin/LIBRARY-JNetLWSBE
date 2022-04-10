@@ -24,8 +24,8 @@ import java.util.List;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-import jnet.physic.PhysicWorld;
-import jnet.physic.SoftBody;
+import jnet.d3.physic.PhysicWorld;
+import jnet.d3.physic.SoftBody;
 import jnet.util.Vec2d;
 
 /**

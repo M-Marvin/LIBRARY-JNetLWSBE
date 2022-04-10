@@ -1,11 +1,11 @@
-package jnet.shapefactory;
+package jnet.d3.shapefactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jnet.shapefactory.Shape.ConstrainDefinition;
-import jnet.shapefactory.Shape.ParticleDefinition;
-import jnet.util.Vec2d;
+import jnet.d3.shapefactory.Shape.ConstrainDefinition;
+import jnet.d3.shapefactory.Shape.ParticleDefinition;
+import jnet.util.Vec3d;
 
 /**
  * The ShapeFactroy is used to combine multiple ShapeBuilders (IShapeParts) to a single complex Shape.
@@ -43,8 +43,8 @@ public class ShapeFactory {
 	 * @param yc Y position of corner C
 	 * @return The ShapeFactory to append more methods
 	 */
-	public ShapeFactory addTriangle(float xa, float ya, float xb, float yb, float xc, float yc) {
-		addShape(new ShapeTriangle(new Vec2d(xa, ya), new Vec2d(xb, yb), new Vec2d(xc, yc)));
+	public ShapeFactory addTriangle(float xa, float ya, float za, float xb, float yb, float zb, float xc, float yc, float zc) {
+		addShape(new ShapeTriangle(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), new Vec3d(xc, yc, zc)));
 		return this;
 	}
 	
@@ -56,8 +56,8 @@ public class ShapeFactory {
 	 * @param yb Y position of corner B
 	 * @return The ShapeFactory to append more methods
 	 */
-	public ShapeFactory addShapeRectangleCross(float xa, float ya, float xb, float yb) {
-		addShape(new ShapeRectangle(new Vec2d(xa, ya), new Vec2d(xb, yb), true));
+	public ShapeFactory addShapeRectangleCross(float xa, float ya, float za, float xb, float yb, float zb) {
+		addShape(new ShapeRectangle(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), true));
 		return this;
 	}
 	
@@ -70,8 +70,8 @@ public class ShapeFactory {
 	 * @param yb Y position of corner B
 	 * @return The ShapeFactory to append more methods
 	 */
-	public ShapeFactory addShapeRectangle(float xa, float ya, float xb, float yb) {
-		addShape(new ShapeRectangle(new Vec2d(xa, ya), new Vec2d(xb, yb), false));
+	public ShapeFactory addShapeRectangle(float xa, float ya, float za, float xb, float yb, float zb) {
+		addShape(new ShapeRectangle(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), false));
 		return this;
 	}
 	
