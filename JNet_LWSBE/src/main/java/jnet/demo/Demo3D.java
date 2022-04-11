@@ -1,10 +1,7 @@
 package jnet.demo;
 
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwInit;
@@ -22,17 +19,16 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
 import jnet.JNet;
 import jnet.d3.physic.PhysicSolver3d;
 import jnet.d3.physic.PhysicWorld3d;
 import jnet.d3.physic.SoftBody3d;
-import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.shapefactory.Shape3d;
 import jnet.render.ShapeBeamRenderer;
 import jnet.util.Vec3d;
+import jnet.util.Vec3f;
 
 /**
  * <strong>CALL ONLY IF LWJGL OPENGL AND GLFW IS INSTALLED</strong>
@@ -72,11 +68,11 @@ public class Demo3D {
 		
 		glfwShowWindow(window);
 		
-//		GL11.glMatrixMode(GL11.GL_PROJECTION);
-//		GL11.glLoadIdentity();
-//		gluPerspective(360, 1000 / 600, -100, 100);
-//        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-//        GL11.glLoadIdentity();
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+		GL11.glLoadIdentity();
+		gluPerspective(20, 1000 / 600, 0.1F, 100);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
 		
 		init();
 		
@@ -125,26 +121,34 @@ public class Demo3D {
 	
 	public ShapeBeamRenderer renderer;
 	
+	public Vec3f rotation = new Vec3f(0, 0, 0);
+	
 	public void init() {
 						
-		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), 20, 20);
+		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), new Color(0, 255, 0, 128), 20, 20);
 		
 		this.world = JNet.D3.setupWorld(new Vec3d());
 		
-		Shape3d shape2 = JNet.D3.buildShape()
-				.addShapeRectangleCross(-300, -300, 0, -200, -200, 0)
-				.addShapeRectangleCross(-300, -200, 0, -200, -100, 0)
-				.addShapeRectangleCross(-300, -100, 0, -200, -0, 0)
-				.addShapeRectangleCross(-200, -300, 0, -100, -200, 0)
-				.addShapeRectangleCross(-200, -200, 0, -100, -100, 0)
-				.addShapeRectangleCross(-200, -100, 0, -100, -0, 0)
-				.addShapeRectangleCross(-100, -300, 0, -0, -200, 0)
-				.addShapeRectangleCross(-100, -200, 0, -0, -100, 0)
-				.addShapeRectangleCross(-100, -100, 0, -0, -0, 0)
-				.build();
-		shape2.changeMaterial(JNet.DEFAULT_MATERIAL_METAL);
-		SoftBody3d object1 = shape2.build();
+//		Shape3d shape2 = JNet.D3.buildShape()
+//				.addShapeRectangleCross(-300, -300, 0, -200, -200, 0).addCollisionTriangle(-300, -300, 0, -300, -200, 0, -200, -200, 0)
+//				.addShapeRectangleCross(-300, -200, 0, -200, -100, 0)
+//				.addShapeRectangleCross(-300, -100, 0, -200, -0, 0)
+//				.addShapeRectangleCross(-200, -300, 0, -100, -200, 0)
+//				.addShapeRectangleCross(-200, -200, 0, -100, -100, 0)
+//				.addShapeRectangleCross(-200, -100, 0, -100, -0, 0)
+//				.addShapeRectangleCross(-100, -300, 0, -0, -200, 0)
+//				.addShapeRectangleCross(-100, -200, 0, -0, -100, 0)
+//				.addShapeRectangleCross(-100, -100, 0, -0, -0, 0)
+//				.build();
+//		shape2.changeMaterial(JNet.DEFAULT_MATERIAL_METAL);
+//		SoftBody3d object1 = shape2.build();
 		
+		Shape3d shape2 = JNet.D3.buildShape()
+				.addTriangle(-200, -200, -200, -200, -200, 200, -250, 200, 0)
+				.addCollisionTriangle(-200, -200, -200, -200, -200, 200, -250, 200, 0)
+				.build();
+		shape2.changeMaterial(JNet.DEFAULT_MATERIAL);
+		SoftBody3d object1 = shape2.build();
 		this.world.addSoftBody(object1);
 		
 		Shape3d shape = JNet.D3.buildShape()
@@ -156,25 +160,39 @@ public class Demo3D {
 		SoftBody3d object2 = shape.build();
 		this.world.addSoftBody(object2);
 		
-		Constrain3d joint = new Constrain3d(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
-		this.world.addJoint(joint);
+		Shape3d shape3 = JNet.D3.buildShape()
+				.addTriangle(-300, -200, 0, -200, -200, 0, -159, 200, 0)
+				.addCollisionTriangle(-300, -200, 0, -200, -200, 0, -159, 200, 0)
+				.build();
+		SoftBody3d object3 = shape3.build();
+		this.world.addSoftBody(object3);
+		
+//		Constrain3d joint = new Constrain3d(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
+//		this.world.addJoint(joint);
 		
 		this.solver = JNet.D3.setupSolver(world);
 		
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 			if (key == GLFW_KEY_RIGHT) {
-				this.world.getSoftBodys().get(0).getConstrains().get(3).pointA.acceleration.x += 200F;
+				this.world.getSoftBodys().get(1).getConstrains().get(0).pointA.acceleration.x += 200F;
 				
-			} else if (key == GLFW_KEY_LEFT) {
-				this.world.getSoftBodys().get(0).getConstrains().get(8).pointA.acceleration.x -= 200F;
+			} else if (key == GLFW.GLFW_KEY_LEFT) {
+				this.world.getSoftBodys().get(1).getConstrains().get(0).pointA.acceleration.x -= 200F;
 				
-			} else if (key == GLFW_KEY_UP) {
-				this.world.getSoftBodys().get(0).getConstrains().get(26).pointA.acceleration.y += 200F;
+			} else if (key == GLFW.GLFW_KEY_UP) {
+				this.world.getSoftBodys().get(1).getConstrains().get(0).pointA.acceleration.y += 200F;
 				
-			} else if (key == GLFW_KEY_DOWN) {
-				this.world.getSoftBodys().get(0).getConstrains().get(9).pointA.acceleration.y -= 200F;
-				this.world.getSoftBodys().get(0).getConstrains().get(9).pointA.acceleration.z -= 2F;
+			} else if (key == GLFW.GLFW_KEY_DOWN) {
+				this.world.getSoftBodys().get(1).getConstrains().get(0).pointA.acceleration.y -= 200F;
 				
+			} else if (key == GLFW.GLFW_KEY_W) {
+				this.rotation.y += 1;				
+			} else if (key == GLFW.GLFW_KEY_A) {
+				this.rotation.x -= 1;						
+			} else if (key == GLFW.GLFW_KEY_S) {
+				this.rotation.y -= 1;						
+			} else if (key == GLFW.GLFW_KEY_D) {
+				this.rotation.x += 1;						
 			} else if (key == GLFW.GLFW_KEY_Q) {
 				if (!pressed) {
 					this.run = !this.run;
@@ -198,7 +216,13 @@ public class Demo3D {
 	public void renderTick() {
 		
 		GL11.glPushMatrix();
-
+		
+		System.out.println(this.rotation);
+		//GL11.glTranslated(0, 0, -300);
+		GL11.glRotatef(this.rotation.x, 1, 0, 0);
+		GL11.glRotatef(this.rotation.y, 0, 1, 0);
+		//GL11.glTranslated(0, 0, -300);
+		
 		float scaleX = 1000;
 		float scaleY = 600;
 		GL11.glScalef(1 / scaleX, 1 / scaleY, 1);

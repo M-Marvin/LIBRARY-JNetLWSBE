@@ -117,7 +117,7 @@ public class Demo2D {
 	
 	public void init() {
 						
-		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), 20, 20);
+		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), new Color(0, 0, 0), 20, 20);
 		
 		this.world = JNet.D2.setupWorld(new Vec2d());
 		

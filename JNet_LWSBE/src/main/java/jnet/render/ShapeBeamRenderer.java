@@ -34,7 +34,7 @@ import jnet.util.Vec3d;
 /**
  * <strong>CALL ONLY IF LWJGL OPENGL AND GLFW IS INSTALLED</strong>
  * The ShapeBeamRenderer is a class that can draw Constrains Joints and Particles on the screen using LWJGL 3.
- * It must not be used and is only for debuging.
+ * It must not be used and is only for debugging.
  * @author M_Marvin
  *
  */
@@ -42,27 +42,29 @@ public class ShapeBeamRenderer {
 	
 	protected Color stripColor;
 	protected Color pointColor;
+	protected Color planeColor;
 	protected float pointSize;
 	protected float stripWidth;
 	
 	protected HashMap<SoftBody3d, Mesh[]> shapeMeshCache;
 	
-	public ShapeBeamRenderer(Color stripColor, Color pointColor, float pointSize, float stripWidth) {
+	public ShapeBeamRenderer(Color stripColor, Color pointColor, Color planeColor, float pointSize, float stripWidth) {
 		this.pointColor = pointColor;
 		this.stripColor = stripColor;
+		this.planeColor = planeColor;
 		this.pointSize = pointSize;
 		this.stripWidth = stripWidth;
 		this.shapeMeshCache = new HashMap<SoftBody3d, Mesh[]>();
 	}
 	
 	protected Mesh[] makeShapeMesh(SoftBody3d shape) {
-
+		
 		List<Vec3d> renderedPoints = new ArrayList<Vec3d>();
 		
 		FloatBuffer stripBuffer = BufferUtils.createFloatBuffer(shape.getConstrains().size() * 6);
 		
 		shape.getConstrains().forEach((strip) -> {
-						
+			
 			Vec3d stripStart = strip.pointA.pos;
 			Vec3d stripEnd = strip.pointB.pos;
 			
@@ -90,14 +92,37 @@ public class ShapeBeamRenderer {
 			
 		});
 		
+		FloatBuffer planeBuffer = BufferUtils.createFloatBuffer(shape.getPlanes().size() * 9);
+		
+		shape.getPlanes().forEach((plane) -> {
+			
+			Vec3d planeA = plane.particleA.pos;
+			Vec3d planeB = plane.particleB.pos;
+			Vec3d planeC = plane.particleC.pos;
+			
+			planeBuffer.put((float) planeA.x);
+			planeBuffer.put((float) planeA.y);
+			planeBuffer.put((float) planeA.z);
+			planeBuffer.put((float) planeB.x);
+			planeBuffer.put((float) planeB.y);
+			planeBuffer.put((float) planeB.z);
+			planeBuffer.put((float) planeC.x);
+			planeBuffer.put((float) planeC.y);
+			planeBuffer.put((float) planeC.z);
+			
+		});
+		
 		pointBuffer.flip();
 		stripBuffer.flip();
+		planeBuffer.flip();
 		Mesh pointMesh = new Mesh();
 		pointMesh.uploadVertecies(pointBuffer);
 		Mesh stripMesh = new Mesh();
 		stripMesh.uploadVertecies(stripBuffer);
+		Mesh planeMesh = new Mesh();
+		planeMesh.uploadVertecies(planeBuffer);
 		
-		Mesh[] meshes = new Mesh[] {stripMesh, pointMesh};
+		Mesh[] meshes = new Mesh[] {stripMesh, pointMesh, planeMesh};
 		
 		return meshes;
 		
@@ -239,6 +264,9 @@ public class ShapeBeamRenderer {
 		
 		GL11.glColor4f(this.pointColor.getRed() / 255F, this.pointColor.getGreen() / 255F, this.pointColor.getBlue() / 255F, this.pointColor.getAlpha() / 255F);
 		meshes[1].draw(GL11.GL_POINTS);
+
+		GL11.glColor4f(this.planeColor.getRed() / 255F, this.planeColor.getGreen() / 255F, this.planeColor.getBlue() / 255F, this.planeColor.getAlpha() / 255F);
+		meshes[2].draw(GL11.GL_TRIANGLES);
 		
 		GL11.glPopMatrix();
 		

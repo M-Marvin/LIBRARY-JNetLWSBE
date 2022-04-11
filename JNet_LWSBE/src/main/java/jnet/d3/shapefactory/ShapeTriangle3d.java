@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jnet.JNet;
+import jnet.d3.shapefactory.Shape3d.CollisionPlaneDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ConstrainDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ParticleDefinition3d;
 import jnet.util.Material;
@@ -20,6 +21,7 @@ public class ShapeTriangle3d implements IShapePart3d {
 	protected Vec3d vb;
 	protected Vec3d vc;
 	protected Material material;
+	protected boolean collisionPlane;
 	
 	public ShapeTriangle3d(Vec3d va, Vec3d vb, Vec3d vc) {
 		this.va = va;
@@ -28,11 +30,27 @@ public class ShapeTriangle3d implements IShapePart3d {
 		this.material = JNet.DEFAULT_MATERIAL;
 	}
 	
+	public ShapeTriangle3d(Vec3d va, Vec3d vb, Vec3d vc, boolean collisionPlane) {
+		this.va = va;
+		this.vb = vb;
+		this.vc = vc;
+		this.material = JNet.DEFAULT_MATERIAL;
+		this.collisionPlane = collisionPlane;
+	}
+	
 	public ShapeTriangle3d(Vec3d va, Vec3d vb, Vec3d vc, Material material) {
 		this.va = va;
 		this.vb = vb;
 		this.vc = vc;
 		this.material = material;
+	}
+
+	public ShapeTriangle3d(Vec3d va, Vec3d vb, Vec3d vc, boolean collisionPlane, Material material) {
+		this.va = va;
+		this.vb = vb;
+		this.vc = vc;
+		this.material = material;
+		this.collisionPlane = collisionPlane;
 	}
 	
 	public void setMaterial(Material material) {
@@ -43,12 +61,21 @@ public class ShapeTriangle3d implements IShapePart3d {
 		return material;
 	}
 	
+	public void setCollisionPlane(boolean collisionPlane) {
+		this.collisionPlane = collisionPlane;
+	}
+	
+	public boolean getsetCollisionPlane() {
+		return collisionPlane;
+	}
+	
 	/**
 	 * Building the triangle
 	 */
 	@Override
-	public List<ConstrainDefinition3d> getConstrains() {
+	public List<?>[] getConstrainsAndPlanes() {
 		List<ConstrainDefinition3d> constrainDefinitions = new ArrayList<ConstrainDefinition3d>();
+		List<CollisionPlaneDefinition3d> planeDefinitions = new ArrayList<CollisionPlaneDefinition3d>();
 		
 		ParticleDefinition3d pointA = new ParticleDefinition3d(va);
 		ParticleDefinition3d pointB = new ParticleDefinition3d(vb);
@@ -61,7 +88,11 @@ public class ShapeTriangle3d implements IShapePart3d {
 		constrainDefinitions.add(new ConstrainDefinition3d(pointC, pointA));
 		constrainDefinitions.get(constrainDefinitions.size() - 1).changeMaterial(material);
 		
-		return constrainDefinitions;
+		if (collisionPlane) {
+			planeDefinitions.add(new CollisionPlaneDefinition3d(constrainDefinitions.get(0), constrainDefinitions.get(1), constrainDefinitions.get(2)));
+		}
+		
+		return new List<?>[] {constrainDefinitions, planeDefinitions};
 	}
 	
 }

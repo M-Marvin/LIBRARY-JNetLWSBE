@@ -3,6 +3,7 @@ package jnet.d3.shapefactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import jnet.d3.shapefactory.Shape3d.CollisionPlaneDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ConstrainDefinition3d;
 import jnet.d3.shapefactory.Shape3d.ParticleDefinition3d;
 import jnet.util.Vec3d;
@@ -15,12 +16,14 @@ import jnet.util.Vec3d;
 public class ShapeFactory3d {
 	
 	protected List<IShapePart3d> shapeParts;
+	protected List<Vec3d[]> additionalShapePlanes;
 	
 	/**
 	 * Creates a new ShapeFactory and starts a new Shape build
 	 */
 	public ShapeFactory3d() {
 		this.shapeParts = new ArrayList<IShapePart3d>();
+		this.additionalShapePlanes = new ArrayList<Vec3d[]>();
 	}
 	
 	/**
@@ -45,6 +48,21 @@ public class ShapeFactory3d {
 	 */
 	public ShapeFactory3d addTriangle(float xa, float ya, float za, float xb, float yb, float zb, float xc, float yc, float zc) {
 		addShape(new ShapeTriangle3d(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), new Vec3d(xc, yc, zc)));
+		return this;
+	}
+
+	/**
+	 * Adds a triangle to the Shape including a collision plane
+	 * @param xa X position of corner A
+	 * @param ya Y position of corner A
+	 * @param xb X position of corner B
+	 * @param yb Y position of corner B
+	 * @param xc X position of corner C
+	 * @param yc Y position of corner C
+	 * @return The ShapeFactory to append more methods
+	 */
+	public ShapeFactory3d addTriangleAndPlane(float xa, float ya, float za, float xb, float yb, float zb, float xc, float yc, float zc) {
+		addShape(new ShapeTriangle3d(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), new Vec3d(xc, yc, zc), true));
 		return this;
 	}
 	
@@ -74,17 +92,36 @@ public class ShapeFactory3d {
 		addShape(new ShapeRectangle3d(new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), false));
 		return this;
 	}
+
+	/**
+	 * Adds a additional collision plane triangle to the ones from the Shapes (if any provided)
+	 * @param xa X position of corner A
+	 * @param ya Y position of corner A
+	 * @param xb X position of corner B
+	 * @param yb Y position of corner B
+	 * @param xc X position of corner C
+	 * @param yc Y position of corner C
+	 * @return The ShapeFactory to append more methods
+	 */
+	public ShapeFactory3d addCollisionTriangle(float xa, float ya, float za, float xb, float yb, float zb, float xc, float yc, float zc) {
+		this.additionalShapePlanes.add(new Vec3d[] {new Vec3d(xa, ya, za), new Vec3d(xb, yb, zb), new Vec3d(xc, yc, zc)});
+		return this;
+	}
 	
 	/**
 	 * Completes the current build and returns a Shape that is like a definition of a SoftBody and can create multiple identical SoftBodys.
 	 * @return A Shape representing the SoftBody
 	 */
+	@SuppressWarnings("unchecked")
 	public Shape3d build() {
 		
 		Shape3d shape = new Shape3d();
 		
 		for (IShapePart3d shapePart : this.shapeParts) {
-			List<ConstrainDefinition3d> partConstrains = shapePart.getConstrains();
+			List<?>[] components = shapePart.getConstrainsAndPlanes();
+			List<ConstrainDefinition3d> partConstrains = (List<ConstrainDefinition3d>) components[0];
+			List<CollisionPlaneDefinition3d> planeDefinitions = (List<CollisionPlaneDefinition3d>) components[1];
+			
 			for (ConstrainDefinition3d partConstrain : partConstrains) {
 				
 				ParticleDefinition3d pointA = partConstrain.pointA;
@@ -102,11 +139,23 @@ public class ShapeFactory3d {
 				if (!shape.getConstrains().contains(partConstrain)) shape.getConstrains().add(partConstrain);
 				
 			}
+			
+			for (CollisionPlaneDefinition3d planeDefinition : planeDefinitions) {
+				shape.addPlane(planeDefinition);
+			}
+			
 		}
 		
 		for (ConstrainDefinition3d constrain : shape.getConstrains()) {
 			if (!shape.getParticles().contains(constrain.pointA)) shape.getParticles().add(constrain.pointA);
 			if (!shape.getParticles().contains(constrain.pointB)) shape.getParticles().add(constrain.pointB);
+		}
+
+		for (Vec3d[] planeCorners : this.additionalShapePlanes) {
+			ConstrainDefinition3d constrainA = shape.searchBeam(planeCorners[0], planeCorners[1]);
+			ConstrainDefinition3d constrainB = shape.searchBeam(planeCorners[1], planeCorners[2]);
+			ConstrainDefinition3d constrainC = shape.searchBeam(planeCorners[2], planeCorners[0]);
+			shape.addPlane(new CollisionPlaneDefinition3d(constrainA, constrainB, constrainC));
 		}
 		
 		return shape;

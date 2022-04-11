@@ -246,10 +246,19 @@ public class PhysicSolver3d {
 		C = edge2.cross(vp2); 
 		if (N.dot(C) < 0) return Contact3d.noContact(); // P is on the right side; 
 		
+		// FIXME
 		
-		Vec3d collisionNormal = particle.pos.noramlVec(P);
-		double collisionDepth = particle.pos.distance(P);
-		return Contact3d.contact(collisionNormal, collisionDepth, particle, plane);
+		if (P.x > particle.pos.x ? P.x < particle.lastPos.x : P.x > particle.lastPos.x &&
+			P.x > particle.pos.y ? P.y < particle.lastPos.y : P.y > particle.lastPos.y &&
+			P.x > particle.pos.z ? P.z < particle.lastPos.z : P.z > particle.lastPos.z) {
+
+			Vec3d collisionNormal = particle.pos.noramlVec(P);
+			double collisionDepth = particle.pos.distance(P);
+			return Contact3d.contact(collisionNormal, collisionDepth, particle, plane);
+			
+		}
+		
+		return Contact3d.noContact();
 		
 //		// Phase 1 check: Vector (infinity line) intersection check
 //		Vec3d line1a = constrain.pointA.pos;
@@ -287,6 +296,7 @@ public class PhysicSolver3d {
 		
 		if (!contact.isCollision()) throw new RuntimeException(new IllegalStateException("Can not handle non-collision Contact instance!"));
 		
+		// TODO
 		System.out.println("COLLISION");
 		
 //		Particle3d particle1 = contact.getParticle();

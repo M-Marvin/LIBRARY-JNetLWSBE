@@ -1,7 +1,6 @@
 package jnet.d3.physic;
 
 import jnet.d3.physic.SoftBody3d.CollisionPlane3d;
-import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.physic.SoftBody3d.Particle3d;
 import jnet.util.Vec3d;
 

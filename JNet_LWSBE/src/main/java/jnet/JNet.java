@@ -31,8 +31,8 @@ public class JNet {
 	 * @param stripWidth The Size of the Beams
 	 * @return A new ShapeBeamRenderer
 	 */
-	public static ShapeBeamRenderer setupShapeBeamRenderer(Color stripColor, Color pointColor, float pointSize, float stripWidth) {
-		return new ShapeBeamRenderer(stripColor, pointColor, pointSize, stripWidth);
+	public static ShapeBeamRenderer setupShapeBeamRenderer(Color stripColor, Color pointColor, Color planeColor, float pointSize, float stripWidth) {
+		return new ShapeBeamRenderer(stripColor, pointColor, planeColor, pointSize, stripWidth);
 	}
 	
 	public static class D2 {

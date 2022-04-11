@@ -34,6 +34,7 @@ public class Shape3d {
 	 */
 	public void addPlane(CollisionPlaneDefinition3d plane) {
 		this.planes.add(plane);
+		if (plane.constrainA == null || plane.constrainB == null || plane.constrainC == null) return;
 		if (!this.constrains.contains(plane.constrainA)) addConstrain(plane.constrainA);
 		if (!this.constrains.contains(plane.constrainB)) addConstrain(plane.constrainB);
 		if (!this.constrains.contains(plane.constrainC)) addConstrain(plane.constrainC);
@@ -68,6 +69,9 @@ public class Shape3d {
 		});
 		this.constrains.forEach((constrainDefinition) -> {
 			body.addConstrain(constrainDefinition.build());
+		});
+		this.planes.forEach((planeDefinition) -> {
+			body.addPlane(planeDefinition.build());
 		});
 		return body;
 	}
@@ -132,6 +136,41 @@ public class Shape3d {
 		}
 		return null;
 	}
+
+	/**
+	 * Returns the first CollisionPlaneDefinition with the corners at the given positions or null if no matching CollisionPlaneDefinition is found
+	 * @param position1 The position of the first ParticleDefinition (A)
+	 * @param position2 The position of the second ParticleDefinition (B)
+	 * @param position3 The position of the third ParticleDefinition (C)
+	 * @return The first matching ConstrainDefinition or null if no one is found
+	 */
+	public CollisionPlaneDefinition3d searchPlane(Vec3d position1, Vec3d position2, Vec3d position3) {
+		ConstrainDefinition3d constrainA = searchBeam(position1, position2);
+		ConstrainDefinition3d constrainB = searchBeam(position2, position3);
+		ConstrainDefinition3d constrainC = searchBeam(position3, position1);
+		
+		for (CollisionPlaneDefinition3d plane : this.planes) {
+			if (plane.constrainA.equals(constrainA) && plane.constrainA.equals(constrainB) && plane.constrainA.equals(constrainC)) return plane;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the first CollisionPlaneDefinition with the corners at the given positions or null if no matching CollisionPlaneDefinition is found
+	 * @param x1 The x position of the first ParticleDefinition
+	 * @param y1 The y position of the first ParticleDefinition
+	 * @param y1 The z position of the first ParticleDefinition
+	 * @param x2 The x position of the second ParticleDefinition
+	 * @param y2 The y position of the second ParticleDefinition
+	 * @param z2 The z position of the second ParticleDefinition
+	 * @param x3 The x position of the third ParticleDefinition
+	 * @param y3 The y position of the third ParticleDefinition
+	 * @param z3 The z position of the third ParticleDefinition
+	 * @return The first matching ConstrainDefinition or null if no one is found
+	 */
+	public CollisionPlaneDefinition3d searchPlane(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3) {
+		return searchPlane(new Vec3d(x1, y1, z1), new Vec3d(x2, y2, z2), new Vec3d(x3, y3, z3));
+	}
 	
 	/** ##########################################################**/
 	
@@ -140,7 +179,7 @@ public class Shape3d {
 		public ConstrainDefinition3d constrainA = new ConstrainDefinition3d(); // Only for the equals check
 		public ConstrainDefinition3d constrainB = new ConstrainDefinition3d(); // Only for the equals check
 		public ConstrainDefinition3d constrainC = new ConstrainDefinition3d(); // Only for the equals check
-
+		
 		public CollisionPlane3d lastBuild;
 		
 		public CollisionPlaneDefinition3d() {}
@@ -168,6 +207,7 @@ public class Shape3d {
 		 * @throws RuntimeException of a IllegalStateException when the used ConstrainDefinitions are not build
 		 */
 		public CollisionPlane3d build() {
+			if (this.constrainA == null || this.constrainB == null || this.constrainC == null) throw new RuntimeException(new IllegalStateException("Cant build CollisionPlane with null ConstrainDefinitions!"));
 			if (this.constrainA.lastBuild == null || this.constrainB.lastBuild == null || this.constrainC.lastBuild == null) throw new RuntimeException(new IllegalStateException("Cant build CollisionPlane before the Constrains are build!"));
 			this.lastBuild = new CollisionPlane3d(this);
 			return this.lastBuild;
