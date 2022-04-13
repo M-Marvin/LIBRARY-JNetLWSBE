@@ -112,6 +112,7 @@ public class Vec3d implements IVector3D<Double> {
 
 	public Vec3d normalize() {
 		double magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+		if (magnitude < 0.000000000001F) return new Vec3d(0, 0, 0); // TODO
 		return this.div(magnitude);
 	}
 

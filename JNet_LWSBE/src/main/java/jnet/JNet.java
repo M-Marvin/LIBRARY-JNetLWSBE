@@ -13,8 +13,13 @@ import jnet.util.Material;
 import jnet.util.Vec2d;
 import jnet.util.Vec3d;
 
+/**
+ * A simple helper class that provides methods to create basic simulations
+ * @author M_Marvin
+ * 
+ **/
 public class JNet {
-
+	
 	/** The default material of all created SoftBodys and Shapes **/
 	public static final Material DEFAULT_MATERIAL = new Material(0.01F, 1F, 1.4F, 1F);
 	/** An alternate example material that is more stable, like metal **/
@@ -22,7 +27,7 @@ public class JNet {
 	
 	/** The default number of iterations used in the PhysicSolver **/
 	public static final int DEFAULT_NUM_ITTERATIONS = 20;
-
+	
 	/**
 	 * LWJGL3 ONLY: Creates a new ShapeBeamRenderer to visualize the simulated SoftBodys Particles (Nodes) and Constrains (Beams). This is only a helper method, the Renderer can also created manually.
 	 * @param stripColor The Color for the Beams
@@ -35,6 +40,11 @@ public class JNet {
 		return new ShapeBeamRenderer(stripColor, pointColor, planeColor, pointSize, stripWidth);
 	}
 	
+	/**
+	 * Subclass of JNet for 2D specific stuff
+	 * @author M_Marvin
+	 * 
+	 **/
 	public static class D2 {
 		
 		/**
@@ -66,7 +76,12 @@ public class JNet {
 		}
 		
 	}
-
+	
+	/**
+	 * Subclass of JNet for 3D specific stuff
+	 * @author M_Marvin
+	 * 
+	 **/
 	public static class D3 {
 		
 		/**

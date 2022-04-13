@@ -27,6 +27,7 @@ import jnet.d3.physic.PhysicWorld3d;
 import jnet.d3.physic.SoftBody3d;
 import jnet.d3.shapefactory.Shape3d;
 import jnet.render.ShapeBeamRenderer;
+import jnet.util.Vec2f;
 import jnet.util.Vec3d;
 import jnet.util.Vec3f;
 
@@ -42,6 +43,8 @@ public class Demo3D {
 		new Demo3D().start();
 	}
 	
+	protected Vec2f camRot;
+	protected Vec3f camPos;
 	protected long window;
 	private static Demo3D instance;
 	private static boolean running;
@@ -68,11 +71,11 @@ public class Demo3D {
 		
 		glfwShowWindow(window);
 		
-		GL11.glMatrixMode(GL11.GL_PROJECTION);
-		GL11.glLoadIdentity();
-		gluPerspective(20, 1000 / 600, 0.1F, 100);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadIdentity();
+//		GL11.glMatrixMode(GL11.GL_PROJECTION);
+//		GL11.glLoadIdentity();
+//		gluPerspective(70, 1000 / 600, 0.1F, 100);
+//        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+//        GL11.glLoadIdentity();
 		
 		init();
 		
@@ -119,12 +122,15 @@ public class Demo3D {
 	public PhysicWorld3d world;
 	public PhysicSolver3d solver;
 	
+	
+	public SoftBody3d staticObject;
 	public ShapeBeamRenderer renderer;
 	
-	public Vec3f rotation = new Vec3f(0, 0, 0);
-	
 	public void init() {
-						
+		
+		this.camPos = new Vec3f();
+		this.camRot = new Vec2f();
+		
 		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), new Color(0, 255, 0, 128), 20, 20);
 		
 		this.world = JNet.D3.setupWorld(new Vec3d());
@@ -150,6 +156,7 @@ public class Demo3D {
 		shape2.changeMaterial(JNet.DEFAULT_MATERIAL);
 		SoftBody3d object1 = shape2.build();
 		this.world.addSoftBody(object1);
+		staticObject = object1;
 		
 		Shape3d shape = JNet.D3.buildShape()
 				.addShapeRectangle(0, 10, 0, 120, 130, 0)
@@ -185,14 +192,23 @@ public class Demo3D {
 			} else if (key == GLFW.GLFW_KEY_DOWN) {
 				this.world.getSoftBodys().get(1).getConstrains().get(0).pointA.acceleration.y -= 200F;
 				
+				
 			} else if (key == GLFW.GLFW_KEY_W) {
-				this.rotation.y += 1;				
+				this.camPos.z -= 1;						
 			} else if (key == GLFW.GLFW_KEY_A) {
-				this.rotation.x -= 1;						
+				this.camPos.x += 1;						
 			} else if (key == GLFW.GLFW_KEY_S) {
-				this.rotation.y -= 1;						
+				this.camPos.z += 1;						
 			} else if (key == GLFW.GLFW_KEY_D) {
-				this.rotation.x += 1;						
+				this.camPos.x -= 1;						
+			} else if (key == GLFW.GLFW_KEY_I) {
+				this.camRot.y += 1;				
+			} else if (key == GLFW.GLFW_KEY_K) {
+				this.camRot.y -= 1;						
+			} else if (key == GLFW.GLFW_KEY_J) {
+				this.camRot.x -= 1;						
+			} else if (key == GLFW.GLFW_KEY_L) {
+				this.camRot.x += 1;						
 			} else if (key == GLFW.GLFW_KEY_Q) {
 				if (!pressed) {
 					this.run = !this.run;
@@ -217,10 +233,11 @@ public class Demo3D {
 		
 		GL11.glPushMatrix();
 		
-		System.out.println(this.rotation);
+		//System.out.println(this.rotation);
 		//GL11.glTranslated(0, 0, -300);
-		GL11.glRotatef(this.rotation.x, 1, 0, 0);
-		GL11.glRotatef(this.rotation.y, 0, 1, 0);
+		GL11.glRotatef(this.camRot.x, 1, 0, 0);
+		GL11.glRotatef(this.camRot.y, 0, 1, 0);
+		GL11.glTranslated(this.camPos.x, this.camPos.y, this.camPos.z);
 		//GL11.glTranslated(0, 0, -300);
 		
 		float scaleX = 1000;

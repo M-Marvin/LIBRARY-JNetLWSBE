@@ -182,13 +182,16 @@ public class PhysicSolver3d {
 	}
 	
 	/**
-	 * Check if there is a collision between the given particle and the Constrain since the last simulation step
+	 * Check if there is a collision between the given Particle and the CollisionPlane since the last simulation step
 	 * @param particle The Particle
 	 * @param constrain The Constrain
 	 * @return A Contact representing the collision between the two instances, its variables are null if there is no collision
 	 */
 	public Contact3d checkContact(Particle3d particle, CollisionPlane3d plane) {
 		
+		float closeZero = 0.00000001F;
+		
+		// Get corners of the triangle
 		Vec3d v0 = plane.particleA.pos;
 		Vec3d v1 = plane.particleB.pos;
 		Vec3d v2 = plane.particleC.pos;
@@ -197,61 +200,34 @@ public class PhysicSolver3d {
 		Vec3d orig = particle.lastPos;
 		Vec3d dir = particle.lastPos.sub(particle.pos).normalize();
 		
-		//double t = 01010101F; // ????
-		float tol = 0.0000008F; // kEpsi...
-		double t = tol;
+		// Get plane normal
+		Vec3d v0v1 = v1.sub(v0); 
+		Vec3d v0v2 = v2.sub(v0); 
+		Vec3d pvec = dir.cross(v0v2); 
 		
-		// compute plane's normal
-		Vec3d v0v1 = v1.sub(v0);
-		Vec3d v0v2 = v2.sub(v0);
-		Vec3d N = v0v1.cross(v0v2);
-		double area2 = N.length();
-		
-		
-		
-		// Step 1: finding P
-			 
-		// check if ray and plane are parallel ?
-		double NdotRayDirection = N.dot(dir); 
-		if (Math.abs(NdotRayDirection) < tol) return Contact3d.noContact(); // they are parallel so they don't intersect ! 
-		
-		
-		double d = N.mul(-1).dot(v0); 
-		t = -(N.dot(orig) + d) / NdotRayDirection; 
-		
-		// check if the triangle is in behind the ray
-		if (t < 0) return Contact3d.noContact(); // the triangle is behind 
-		
-		// compute the intersection point using equation 1
-		Vec3d P = orig.add(dir.mul(t)); 
-		
-		// Step 2: inside-outside test
-		Vec3d C; // vector perpendicular to triangle's plane 
-		
-		// edge 0
-		Vec3d edge0 = v1.sub(v0); 
-		Vec3d vp0 = P.sub(v0); 
-		C = edge0.cross(vp0); 
-		if (N.dot(C) < 0) return Contact3d.noContact(); // P is on the right side 
-		
-		// edge 1
-		Vec3d edge1 = v2.sub(v1); 
-		Vec3d vp1 = P.sub(v1); 
-		C = edge1.cross(vp1); 
-		if (N.dot(C) < 0)  return Contact3d.noContact(); // P is on the right side 
-		
-		// edge 2
-		Vec3d edge2 = v0.sub(v2); 
-		Vec3d vp2 = P.sub(v2); 
-		C = edge2.cross(vp2); 
-		if (N.dot(C) < 0) return Contact3d.noContact(); // P is on the right side; 
-		
-		// FIXME
-		
+	    // Ray and triangle are parallel if det is close to 0
+	    double det = v0v1.dot(pvec); 
+	    if (Math.abs(det) < closeZero) return Contact3d.noContact(); 
+	    
+	    // Intersection check
+	    double invDet = 1 / det; 
+	    Vec3d tvec = orig.sub(v0); 
+	    double u = tvec.dot(pvec) * invDet; 
+	    if (u < 0 || u > 1) return Contact3d.noContact(); 
+	    Vec3d qvec = tvec.cross(v0v1); 
+	    double v = dir.dot(qvec) * invDet; 
+	    if (v < 0 || u + v > 1) return Contact3d.noContact(); 
+	    
+	    // Get intersection point
+	    double t = v0v2.dot(qvec) * invDet; 
+	    Vec3d P = orig.add(dir.mul(t));
+	    
+	    // Check if intersection point P is in line
 		if (P.x > particle.pos.x ? P.x < particle.lastPos.x : P.x > particle.lastPos.x &&
-			P.x > particle.pos.y ? P.y < particle.lastPos.y : P.y > particle.lastPos.y &&
-			P.x > particle.pos.z ? P.z < particle.lastPos.z : P.z > particle.lastPos.z) {
-
+			P.y > particle.pos.y ? P.y < particle.lastPos.y : P.y > particle.lastPos.y &&
+			P.z > particle.pos.z ? P.z < particle.lastPos.z : P.z > particle.lastPos.z) {
+			
+			// Get collision normal and depth
 			Vec3d collisionNormal = particle.pos.noramlVec(P);
 			double collisionDepth = particle.pos.distance(P);
 			return Contact3d.contact(collisionNormal, collisionDepth, particle, plane);
@@ -260,58 +236,34 @@ public class PhysicSolver3d {
 		
 		return Contact3d.noContact();
 		
-//		// Phase 1 check: Vector (infinity line) intersection check
-//		Vec3d line1a = constrain.pointA.pos;
-//		Vec3d line1b = constrain.pointB.pos;
-//		Vec3d line2a = particle.pos;
-//		Vec3d line2b = particle.lastPos;
-//		double denom =	(line2b.y - line2a.y) * (line1b.x - line1a.x) - (line2b.x - line2a.x) * (line1b.y - line1a.y);
-//		
-//		
-//		if (Math.abs(denom) < 0.000000008) return Contact.noContact();
-//		
-//		// Phase 2 check: Line intersection check
-//		double ua = ((line2b.x - line2a.x) * (line1a.y - line2a.y) - (line2b.y - line2a.y) * (line1a.x - line2a.x)) / denom;
-//		double ub = ((line1b.x - line1a.x) * (line1a.y - line2a.y) - (line1b.y - line1a.y) * (line1a.x - line2a.x)) / denom;
-//		if (!(ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)) return Contact.noContact();
-//		
-//		// Calculate nearest point on constrain
-//		Vec2d v = line1b.sub(line1a);
-//		Vec2d w = particle.pos.sub(line1a);
-//		double b = w.dot(v) / v.dot(v);
-//		Vec2d nearestOnConstrain = line1a.add(v.mul(b));
-//		
-//		double collisionDepth = particle.pos.distance(nearestOnConstrain);
-//		Vec2d collisionNormal = particle.pos.noramlVec(nearestOnConstrain);
-//		return Contact.contact(collisionNormal, collisionDepth, particle, constrain);
-		
 	};
-	
+		
 	/**
 	 * Sets position and forces to solve the given collision
 	 * @param contact The Contact that represents the collision
-	 * @throws A RuntimeException of an IllegalStateException if the given Contact is not a collision
 	 */
 	public void solveCollision(Contact3d contact) {
 		
-		if (!contact.isCollision()) throw new RuntimeException(new IllegalStateException("Can not handle non-collision Contact instance!"));
+		if (!contact.isCollision()) return;
 		
-		// TODO
-		System.out.println("COLLISION");
+		Particle3d particle1 = contact.getParticle();
+		Particle3d particle2A = contact.getPlane().particleA;
+		Particle3d particle2B = contact.getPlane().particleB;
+		Particle3d particle2C = contact.getPlane().particleC;
 		
-//		Particle3d particle1 = contact.getParticle();
-//		Particle3d particle2A = contact.getConstrain().pointA;
-//		Particle3d particle2B = contact.getConstrain().pointB;
-//		
-//		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
-//		
-//		double distA = particle1.pos.distance(particle2A.pos);
-//		double distB = particle1.pos.distance(particle2B.pos);
-//		double ca = distA / (distA + distB);
-//		double cb = distB / (distA + distB);
-//		
-//		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb / 1.9F));
-//		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca / 1.9F));
+		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
+		
+		double distA = particle1.pos.distance(particle2A.pos);
+		double distB = particle1.pos.distance(particle2A.pos);
+		double distC = particle1.pos.distance(particle2A.pos);
+		
+		double ca = distA / (distA + distB + distC);
+		double cb = distB / (distA + distB + distC);
+		double cc = distC / (distA + distB + distC);
+		
+		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca / 1.9F));
+		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb / 1.9F));
+		particle2C.pos = particle2C.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cc / 1.9F));
 		
 	}
 	

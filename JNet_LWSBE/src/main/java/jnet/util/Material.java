@@ -44,11 +44,16 @@ public class Material {
 	}
 
 	public float getMass() {
-		return mass;
+		return Math.max(mass, 0);
 	}
 
 	public void setMass(float mass) {
 		this.mass = mass;
 	}
+	
+// TODO Implement static particles
+//	public boolean isStatic() {
+//		return this.mass < 0;
+//	}
 	
 }

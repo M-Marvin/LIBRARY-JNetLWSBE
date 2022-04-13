@@ -219,7 +219,7 @@ public class PhysicSolver2d {
 	 */
 	public void solveCollision(Contact2d contact) {
 		
-		if (!contact.isCollision()) throw new RuntimeException(new IllegalStateException("Can not handle non-collision Contact instance!"));
+		if (!contact.isCollision()) return;
 		
 		Particle2d particle1 = contact.getParticle();
 		Particle2d particle2A = contact.getConstrain().pointA;

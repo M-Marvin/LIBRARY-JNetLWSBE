@@ -76,10 +76,10 @@ public class Contact3d {
 	}
 	
 	/**
-	 * Ge5ts the Constrain of the collision
-	 * @return The Constrain of the collision
+	 * Ge5ts the CollisionPlane of the collision
+	 * @return The CollisionPlane of the collision
 	 */
-	public CollisionPlane3d getConstrain() {
+	public CollisionPlane3d getPlane() {
 		return plane;
 	}
 	
