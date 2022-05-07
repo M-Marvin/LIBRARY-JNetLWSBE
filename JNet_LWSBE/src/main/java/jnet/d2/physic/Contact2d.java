@@ -48,7 +48,7 @@ public class Contact2d {
 	 * @return true if 
 	 */
 	public boolean isCollision() {
-		return this.collisionNormal != null && this.collisionDepth != 0;
+		return this.collisionNormal != null && this.collisionDepth != 0 && collisionDepth == collisionDepth;
 	}
 	
 	/**

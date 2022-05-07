@@ -128,12 +128,21 @@ public class Shape2d {
 		public float stiffness;
 		public float deformForce;
 		public float maxBending;
+		public boolean collision;
 		
 		public ConstrainDefinition2d() {}
 		
 		public ConstrainDefinition2d(ParticleDefinition2d pointA, ParticleDefinition2d pointB) {
 			this.pointA = pointA;
 			this.pointB = pointB;
+			this.collision = true;
+			this.changeMaterial(JNet.DEFAULT_MATERIAL);
+		}
+
+		public ConstrainDefinition2d(ParticleDefinition2d pointA, ParticleDefinition2d pointB, boolean collision) {
+			this.pointA = pointA;
+			this.pointB = pointB;
+			this.collision = collision;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
 		
@@ -178,21 +187,30 @@ public class Shape2d {
 		
 		public Vec2d pos = new Vec2d();
 		public float mass;
+		public boolean isStatic;
 		
 		public Particle2d lastBuild;
 		
 		public ParticleDefinition2d() {}
-		
+
 		public ParticleDefinition2d(Vec2d pos) {
 			this.pos = pos;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
+		
+		public ParticleDefinition2d(Vec2d pos, boolean isStatic) {
+			this.pos = pos;
+			this.isStatic = isStatic;
+			this.changeMaterial(JNet.DEFAULT_MATERIAL);
+		}
+		
 		/**
 		 * Like the method of the Particle, changes the material-property of the definition
 		 * @param material The new material-info
 		 */
 		public void changeMaterial(Material material) {
 			this.mass = material.getMass();
+			this.isStatic = material.isStatic();
 		}
 		
 		/**
@@ -208,7 +226,8 @@ public class Shape2d {
 		public boolean equals(Object obj) {
 			if (obj instanceof ParticleDefinition2d) {
 				return	((ParticleDefinition2d) obj).pos.equals(this.pos) &&
-						((ParticleDefinition2d) obj).mass == this.mass;
+						((ParticleDefinition2d) obj).mass == this.mass &&
+						((ParticleDefinition2d) obj).isStatic == this.isStatic;
 			}
 			return false;
 		}

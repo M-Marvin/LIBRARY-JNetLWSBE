@@ -95,6 +95,7 @@ public class SoftBody2d {
 		public float stiffness;
 		public float deformForce;
 		public float maxBending;
+		public boolean collision;
 		
 		/**
 		 * Construct Constrain using ConstrainDefinition
@@ -108,6 +109,7 @@ public class SoftBody2d {
 			this.stiffness = definition.stiffness;
 			this.deformForce = definition.deformForce;
 			this.maxBending = definition.maxBending;
+			this.collision = definition.collision;
 		}
 		
 		/***
@@ -116,12 +118,13 @@ public class SoftBody2d {
 		 * @param pointB Node B of the Constrain
 		 * @param material Combined Material-Info
 		 */
-		public Constrain2d(Particle2d pointA, Particle2d pointB, Material material) {
+		public Constrain2d(Particle2d pointA, Particle2d pointB, boolean collision) {
 			this.pointA = pointA;
 			this.pointB = pointB;
 			this.length = pointA.pos.distance(pointB.pos);
 			this.originalLength = length;
-			this.changeMaterial(material);
+			this.collision = collision;
+			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
 		
 		/**
@@ -134,6 +137,7 @@ public class SoftBody2d {
 			this.pointB = pointB;
 			this.length = pointA.pos.distance(pointB.pos);
 			this.originalLength = length;
+			this.collision = true;
 			this.changeMaterial(JNet.DEFAULT_MATERIAL);
 		}
 		
@@ -157,6 +161,7 @@ public class SoftBody2d {
 		public Vec2d lastPos = new Vec2d();
 		public Vec2d acceleration = new Vec2d();
 		public float mass;
+		public boolean isStatic;
 		
 		/**
 		 * Construct Particle (Node) using ParticleDefinition
@@ -167,6 +172,7 @@ public class SoftBody2d {
 			this.lastPos = pos;
 			this.acceleration = new Vec2d();
 			this.mass = definition.mass;
+			this.isStatic = definition.isStatic;
 		}
 		
 		/**
@@ -198,6 +204,7 @@ public class SoftBody2d {
 		 */
 		public void changeMaterial(Material material) {
 			this.mass = material.getMass();
+			this.isStatic = material.isStatic();
 		}
 		
 		/**
@@ -232,7 +239,7 @@ public class SoftBody2d {
 		public void setMotion(Vec2d motion) {
 			this.lastPos = this.pos.sub(motion);
 		}
-			
+		
 	}
 	
 }

@@ -22,13 +22,16 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import jnet.JNet;
+import jnet.d2.physic.Contact2d;
+import jnet.d2.physic.ContactListener2d;
 import jnet.d2.physic.PhysicSolver2d;
 import jnet.d2.physic.PhysicWorld2d;
 import jnet.d2.physic.SoftBody2d;
-import jnet.d2.physic.SoftBody2d.Constrain2d;
 import jnet.d2.shapefactory.Shape2d;
 import jnet.render.ShapeBeamRenderer;
+import jnet.util.Material;
 import jnet.util.Vec2d;
+import jnet.util.VecMath;
 
 /**
  * <strong>CALL ONLY IF LWJGL OPENGL AND GLFW IS INSTALLED</strong>
@@ -44,7 +47,7 @@ public class Demo2D {
 	
 	protected long window;
 	private static Demo2D instance;
-	private static boolean running;
+	public static boolean running;
 	
 	public static Demo2D getInstance() {
 		return instance;
@@ -89,8 +92,17 @@ public class Demo2D {
 			glfwPollEvents();
 			
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-			
+
 			renderTick();
+			
+			//System.out.println(this.world.getSoftBodys().get(0).getParticles().get(0).pos);
+			
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			glfwSwapBuffers(window);
 			
@@ -114,9 +126,12 @@ public class Demo2D {
 	public PhysicSolver2d solver;
 	
 	public ShapeBeamRenderer renderer;
+	private SoftBody2d controledShape;
+
+	int contactsl = 0;
 	
 	public void init() {
-						
+		
 		this.renderer = JNet.setupShapeBeamRenderer(new Color(255, 255, 0, 128), new Color(0, 0, 255, 128), new Color(0, 0, 0), 20, 20);
 		
 		this.world = JNet.D2.setupWorld(new Vec2d());
@@ -132,46 +147,77 @@ public class Demo2D {
 				.addShapeRectangleCross(-100, -200, -0, -100)
 				.addShapeRectangleCross(-100, -100, -0, -0)
 				.build();
-		shape2.changeMaterial(JNet.DEFAULT_MATERIAL_METAL);
+		shape2.changeMaterial(new Material(1F, -1F, -1F, 1F));
 		SoftBody2d object1 = shape2.build();
-		
 		this.world.addSoftBody(object1);
 		
 		Shape2d shape = JNet.D2.buildShape()
-				.addShapeRectangle(0, 10, 120, 130)
-				.addTriangle(0, 10, -120, 10, 0, 130)
-				.addShapeRectangleCross(0, 130, 120, 250)
-				.addTriangle(-120, 10, 0, 250, -120, 130)
+				//.addShapeRectangle(0, 10, 120, 130)
+				//.addTriangle(0, 10, -120, 10, 0, 130)
+				.addShapeRectangleCross(-10, 100, 120, 250)
+				//.addTriangle(-120, 10, 0, 250, -120, 130)
 				.build();
+		shape.changeMaterial(new Material(0.9F, 3F, 1.1F, 2F, false));
 		SoftBody2d object2 = shape.build();
 		this.world.addSoftBody(object2);
 		
-		Constrain2d joint = new Constrain2d(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
-		this.world.addJoint(joint);
+//		Constrain2d joint = new Constrain2d(object1.getParticles().get(0), object2.getParticles().get(0), JNet.DEFAULT_MATERIAL_METAL);
+//		this.world.addJoint(joint);
+		
+		Shape2d ground = JNet.D2.buildShape()
+				.addShapeRectangle(-1000, -540, 1000, -500)
+				.build();
+		SoftBody2d groundPlate = ground.build();
+		groundPlate.changeMaterial(new Material(0.9F, 3F, 1.1F, 2F, true));
+		this.world.addSoftBody(groundPlate);
+		
+		this.controledShape = object1;
+		
+		for (int i = 0; i < 32; i++) {
+			
+		}
+		
+		this.contactsl++;
+		object1.getConstrains().get(contactsl).broken = true;
+		System.out.println("DDD-> " + contactsl);
+		
+		//this.world.setGlobalForce(new Vec2d(0, -0.1F));		
 		
 		this.solver = JNet.D2.setupSolver(world);
 		
+		this.world.setContactListener(new ContactListener2d() {
+			
+			@Override
+			public void endContact(Contact2d contact) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean beginContact(Contact2d contact) {
+				// TODO Auto-generated method stub
+				return true;
+			}
+		});
+		
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+			float speed = 0.1F;
 			if (key == GLFW_KEY_RIGHT) {
-				this.world.getSoftBodys().get(0).getConstrains().get(3).pointA.acceleration.x += 200F;
-				
+				this.controledShape.getParticles().forEach((p) -> p.lastPos.x -= speed);
 			} else if (key == GLFW_KEY_LEFT) {
-				this.world.getSoftBodys().get(0).getConstrains().get(8).pointA.acceleration.x -= 200F;
-				
+				this.controledShape.getParticles().forEach((p) -> p.lastPos.x += speed);
 			} else if (key == GLFW_KEY_UP) {
-				this.world.getSoftBodys().get(0).getConstrains().get(26).pointA.acceleration.y += 200F;
-				
+				this.controledShape.getParticles().forEach((p) -> p.lastPos.y -= speed);
 			} else if (key == GLFW_KEY_DOWN) {
-				this.world.getSoftBodys().get(0).getConstrains().get(9).pointA.acceleration.y -= 200F;
-				
+				this.controledShape.getParticles().forEach((p) -> p.lastPos.y += speed);
 			} else if (key == GLFW.GLFW_KEY_Q) {
 				if (!pressed) {
-					this.run = !this.run;
+					run = !run;
 					this.pressed = true;
 				}
-			} else if (key == GLFW.GLFW_KEY_S) {
+			} else if (key == GLFW.GLFW_KEY_S && action == 0) {
+				this.solver.solve();
 				if (!pressed) {
-					this.solver.solve(1 / 10F);
 					this.pressed = true;
 				}
 			} else {
@@ -182,12 +228,12 @@ public class Demo2D {
 	}
 	
 	protected boolean pressed;
-	protected boolean run;
+	public static boolean run;
 	
 	public void renderTick() {
 		
 		GL11.glPushMatrix();
-
+		
 		float scaleX = 1000;
 		float scaleY = 600;
 		GL11.glScalef(1 / scaleX, 1 / scaleY, 1);
@@ -196,7 +242,7 @@ public class Demo2D {
 		GL11.glColor4f(1, 1, 1, 1);
 		
 		this.world.getSoftBodys().forEach((shape) -> {
-
+			
 			this.renderer.drawShape(shape);
 			
 		});
@@ -211,7 +257,12 @@ public class Demo2D {
 	
 	public void physicTick() {
 		
-		if (run) this.solver.solve(1 / 10F);
+		try {
+			if (run) this.solver.solve();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

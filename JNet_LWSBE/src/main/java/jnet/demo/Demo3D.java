@@ -27,6 +27,7 @@ import jnet.d3.physic.PhysicWorld3d;
 import jnet.d3.physic.SoftBody3d;
 import jnet.d3.shapefactory.Shape3d;
 import jnet.render.ShapeBeamRenderer;
+import jnet.util.Material;
 import jnet.util.Vec2f;
 import jnet.util.Vec3d;
 import jnet.util.Vec3f;
@@ -149,11 +150,13 @@ public class Demo3D {
 //		shape2.changeMaterial(JNet.DEFAULT_MATERIAL_METAL);
 //		SoftBody3d object1 = shape2.build();
 		
+		Material m = new Material(0.01F, 1F, 1.4F, 99999999999F);
+		
 		Shape3d shape2 = JNet.D3.buildShape()
 				.addTriangle(-200, -200, -200, -200, -200, 200, -250, 200, 0)
 				.addCollisionTriangle(-200, -200, -200, -200, -200, 200, -250, 200, 0)
 				.build();
-		shape2.changeMaterial(JNet.DEFAULT_MATERIAL);
+		shape2.changeMaterial(m);
 		SoftBody3d object1 = shape2.build();
 		this.world.addSoftBody(object1);
 		staticObject = object1;
@@ -235,9 +238,9 @@ public class Demo3D {
 		
 		//System.out.println(this.rotation);
 		//GL11.glTranslated(0, 0, -300);
-		GL11.glRotatef(this.camRot.x, 1, 0, 0);
-		GL11.glRotatef(this.camRot.y, 0, 1, 0);
-		GL11.glTranslated(this.camPos.x, this.camPos.y, this.camPos.z);
+//		GL11.glRotatef(this.camRot.x, 1, 0, 0);
+//		GL11.glRotatef(this.camRot.y, 0, 1, 0);
+//		GL11.glTranslated(this.camPos.x, this.camPos.y, this.camPos.z);
 		//GL11.glTranslated(0, 0, -300);
 		
 		float scaleX = 1000;

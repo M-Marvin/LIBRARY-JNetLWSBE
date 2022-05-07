@@ -251,7 +251,7 @@ public class PhysicSolver3d {
 		Particle3d particle2B = contact.getPlane().particleB;
 		Particle3d particle2C = contact.getPlane().particleC;
 		
-		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() / 1.9F));
+		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth()));
 		
 		double distA = particle1.pos.distance(particle2A.pos);
 		double distB = particle1.pos.distance(particle2A.pos);
@@ -261,9 +261,9 @@ public class PhysicSolver3d {
 		double cb = distB / (distA + distB + distC);
 		double cc = distC / (distA + distB + distC);
 		
-		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca / 1.9F));
-		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb / 1.9F));
-		particle2C.pos = particle2C.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cc / 1.9F));
+		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca));
+		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb));
+		particle2C.pos = particle2C.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cc));
 		
 	}
 	

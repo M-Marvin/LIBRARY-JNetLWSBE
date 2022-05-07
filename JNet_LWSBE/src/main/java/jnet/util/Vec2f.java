@@ -112,4 +112,8 @@ public class Vec2f implements IVector2D<Float> {
 		return this.x * this.x + this.y * this.y;
 	}
 	
+	public float cross(Vec2f vec) {
+		return x * vec.y - y * vec.x;
+	}
+	
 }

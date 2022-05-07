@@ -232,6 +232,7 @@ public class SoftBody3d {
 		public Vec3d lastPos = new Vec3d();
 		public Vec3d acceleration = new Vec3d();
 		public float mass;
+		public boolean isStatic;
 		
 		/**
 		 * Construct Particle (Node) using ParticleDefinition

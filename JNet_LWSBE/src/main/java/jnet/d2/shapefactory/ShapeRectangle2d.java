@@ -65,9 +65,9 @@ public class ShapeRectangle2d implements IShapePart2d {
 		constrainDefinitions.get(constrainDefinitions.size() - 1).changeMaterial(material);
 		
 		if (stabelized) {
-			constrainDefinitions.add(new ConstrainDefinition2d(pointA, pointC));
+			constrainDefinitions.add(new ConstrainDefinition2d(pointA, pointC, false));
 			constrainDefinitions.get(constrainDefinitions.size() - 1).changeMaterial(material);
-			constrainDefinitions.add(new ConstrainDefinition2d(pointB, pointD));
+			constrainDefinitions.add(new ConstrainDefinition2d(pointB, pointD, false));
 			constrainDefinitions.get(constrainDefinitions.size() - 1).changeMaterial(material);
 		}
 		

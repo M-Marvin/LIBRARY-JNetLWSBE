@@ -111,5 +111,9 @@ public class Vec2i implements IVector2D<Integer> {
 	public double lengthSqr() {
 		return this.x * this.x + this.y * this.y;
 	}
+
+	public int cross(Vec2i vec) {
+		return x * vec.y - y * vec.x;
+	}
 	
 }

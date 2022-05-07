@@ -11,14 +11,24 @@ public class Material {
 	public float deformForce;
 	public float maxBending;
 	public float mass;
+	public boolean isStatic;
 	
-	public Material(float stiffness, float deformForce, float maxBending, float mass) {
+	public Material(float stiffness, float deformForce, float maxBending, float mass, boolean isStatic) {
 		this.stiffness = stiffness;
 		this.deformForce = deformForce;
 		this.maxBending = maxBending;
 		this.mass = mass;
+		this.isStatic = isStatic;
 	}
-
+	
+	public Material(float stiffness, float deformForce, float maxBending, float mass) {
+		this.stiffness = Math.max(0, Math.min(1, stiffness));
+		this.deformForce = deformForce;
+		this.maxBending = maxBending;
+		this.mass = mass;
+		this.isStatic = false;
+	}
+		
 	public float getStiffness() {
 		return stiffness;
 	}
@@ -51,9 +61,8 @@ public class Material {
 		this.mass = mass;
 	}
 	
-// TODO Implement static particles
-//	public boolean isStatic() {
-//		return this.mass < 0;
-//	}
+	public boolean isStatic() {
+		return this.isStatic;
+	}
 	
 }

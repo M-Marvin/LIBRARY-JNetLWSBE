@@ -165,6 +165,7 @@ public class ShapeBeamRenderer {
 		
 		pointBuffer.flip();
 		stripBuffer.flip();
+		
 		Mesh pointMesh = new Mesh();
 		pointMesh.uploadVertecies(pointBuffer);
 		Mesh stripMesh = new Mesh();
@@ -268,6 +269,11 @@ public class ShapeBeamRenderer {
 		GL11.glColor4f(this.planeColor.getRed() / 255F, this.planeColor.getGreen() / 255F, this.planeColor.getBlue() / 255F, this.planeColor.getAlpha() / 255F);
 		meshes[2].draw(GL11.GL_TRIANGLES);
 		
+
+		meshes[0].destroy();
+		meshes[1].destroy();
+		meshes[2].destroy();
+		
 		GL11.glPopMatrix();
 		
 	}
@@ -295,6 +301,9 @@ public class ShapeBeamRenderer {
 		GL11.glColor4f(this.pointColor.getRed() / 255F, this.pointColor.getGreen() / 255F, this.pointColor.getBlue() / 255F, this.pointColor.getAlpha() / 255F);
 		meshes[1].draw(GL11.GL_POINTS);
 		
+		meshes[0].destroy();
+		meshes[1].destroy();
+		
 		GL11.glPopMatrix();
 		
 	}
@@ -316,6 +325,8 @@ public class ShapeBeamRenderer {
 		
 		GL11.glColor4f(this.stripColor.getRed() / 255F, this.stripColor.getGreen() / 255F, this.stripColor.getBlue() / 255F, this.stripColor.getAlpha() / 255F);
 		mesh.draw(GL11.GL_LINES);
+		
+		mesh.destroy();
 		
 		GL11.glPopMatrix();
 		

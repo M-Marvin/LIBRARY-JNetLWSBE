@@ -101,7 +101,7 @@ public class Vec2d implements IVector2D<Double> {
 
 	public Vec2d noramlVec(Vec2d target) {
 		Vec2d velocity = target.sub(this);
-		return velocity.div(velocity.summ());
+		return velocity.normalize();
 	}
 
 	public double length() {
@@ -110,6 +110,10 @@ public class Vec2d implements IVector2D<Double> {
 	
 	public double lengthSqr() {
 		return this.x * this.x + this.y * this.y;
+	}
+
+	public double cross(Vec2d vec) {
+		return x * vec.y - y * vec.x;
 	}
 	
 }
