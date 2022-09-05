@@ -157,7 +157,7 @@ public class Demo2D {
 				.addShapeRectangleCross(-10, 100, 120, 250)
 				//.addTriangle(-120, 10, 0, 250, -120, 130)
 				.build();
-		shape.changeMaterial(new Material(0.9F, 3F, 1.1F, 2F, false));
+		shape.changeMaterial(new Material(0.9F, 3F, 1.1F, 2F, true));
 		SoftBody2d object2 = shape.build();
 		this.world.addSoftBody(object2);
 		

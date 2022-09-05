@@ -210,14 +210,6 @@ public class PhysicSolver2d {
 		Vec2d tlp = particle.lastPos;
 		Vec2d mv = constrain.pointA.pos.sub(constrain.pointA.lastPos).add(constrain.pointB.pos.sub(constrain.pointB.lastPos).mul(2));
 		
-		if (!result) {
-			particle.lastPos = particle.lastPos.add(mv);
-			tlp = particle.lastPos;
-			result = checkIntersection(particle, constrain);
-			particle.lastPos = particle.lastPos.sub(mv);
-			
-		}
-		
 		if (result) {
 			
 			// Calculate movement of the collision point on the constrain
@@ -228,15 +220,10 @@ public class PhysicSolver2d {
 			if (collisionDepth - tlp.distance(particle.pos) > mv.length()) return Contact2d.noContact();
 			
 			return Contact2d.contact(collisionNormal, collisionDepth, particle, constrain);
-						
+			
 		}
 		
 		return Contact2d.noContact();
-		
-		
-		
-		
-		
 		
 		
 		
@@ -275,6 +262,7 @@ public class PhysicSolver2d {
 		Vec2d p4 = VecMath.lineIntersection(P1last, P1, L12, L1last2);
 		
 		// Particle collision
+		
 		if (VecMath.pointOnLine(p1, L11, L12) && VecMath.pointOnLine(p2, L1last1, L1last2)) {
 			
 			if (VecMath.pointOnLine(P1, p1, p2)) {
@@ -294,33 +282,32 @@ public class PhysicSolver2d {
 				if (VecMath.pointOnLine(p4, L12, L1last2)) return true;
 			} else {
 				
-				// FIXME Couse's instability
-//				if (VecMath.pointOnLine(P1, p1, p2) && VecMath.pointOnLine(P1last, p1, p2) &&
-//						VecMath.pointOnLine(P1, p3, p4) && VecMath.pointOnLine(P1last, p3, p4) &&
-//						VecMath.pointInPolygon(L11, L12, L1last2, L1last1, P1) && VecMath.pointInPolygon(L11, L12, L1last2, L1last1, P1last)) {
-//						
-//						Vec2d v5 = VecMath.lineIntersection(L11, L1last1, L12, L1last2);
-//						if (VecMath.pointOnLine(v5, L11, L1last1) || VecMath.pointOnLine(v5, L11, L1last1)) {
-//							System.out.println("                 sssss");
-//							return false;
-//						}
-//						
-//						Vec2d collisionPoint = VecMath.nearestPointOnLine(particle.pos, constrain.pointA.pos, constrain.pointB.pos);
-//						double collisionDepth = particle.pos.distance(collisionPoint);
-//						
-//						if (collisionDepth > 4) {
-//							System.out.println("INSTABLE " + collisionDepth);
-//							//constrain.broken = true;
-//							//particle.pos.y += 40;
-//							
-//							//this.world.addSoftBody(JNet.D2.buildShape().addTriangle((float) p1.x, (float) p1.y,(float)  p2.x, (float) p2.y,(float)  p3.x, (float) p2.y).build().build());
-//							
-//							return false;
-//						} else {
-//							System.out.println("STABLE");
-//						}
-//						return true;
-//					}
+				// Constrain collision
+				// FIXME
+				
+				double distP1 = P1.distance(L11) + P1.distance(L12);
+				double distP2 = P1last.distance(L11) + P1last.distance(L12);
+				
+				Vec2d pointNear = distP1 < distP2 ? P1 : P1last;
+				Vec2d pointFar = distP1 < distP2 ? P1last : P1;
+				
+				Vec2d lineMovement1 = L11.sub(L1last1);
+				Vec2d lineMovement2 = L12.sub(L1last2);
+				
+				Vec2d lineMovement = lineMovement1.length() > lineMovement2.length() ? lineMovement1 : lineMovement2;
+				
+				pointNear = pointNear.add(lineMovement.mul(2));
+				pointFar = pointFar.sub(lineMovement.mul(2));
+				
+				Vec2d p1near = VecMath.lineIntersection(pointFar, pointNear, L11, L12);
+				Vec2d p1far = VecMath.lineIntersection(pointFar, pointNear, L1last1, L1last2);
+				
+				if (VecMath.pointOnLine(p1near, L11, L12) && VecMath.pointOnLine(p1far, L1last1, L1last2) &&
+					VecMath.pointOnLine(p1near, pointFar, pointNear) && VecMath.pointOnLine(p1far, pointFar, pointNear)) {
+					
+					return true;
+					
+				}
 				
 			}
 			
@@ -344,7 +331,7 @@ public class PhysicSolver2d {
 		Particle2d particle2A = contact.getConstrain().pointA;
 		Particle2d particle2B = contact.getConstrain().pointB;
 		
-		boolean staticPart = false;//particle1.isStatic || particle2A.isStatic || particle2B.isStatic;
+		boolean staticPart = particle1.isStatic || particle2A.isStatic || particle2B.isStatic;
 		
 		if (!particle1.isStatic) particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() * (staticPart ? 2 : 1.5)));
 		

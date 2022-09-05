@@ -70,7 +70,7 @@ public class VecMath {
 	}
 	
 	public static boolean pointOnLine(Vec2d point, Vec2d lineA, Vec2d lineB) {
-		return point.distance(lineA) + point.distance(lineB) - lineA.distance(lineB) <= 0.00000001F;
+		return point.distance(lineA) + point.distance(lineB) - lineA.distance(lineB) <= 0.0001F;
 
 	}
 	

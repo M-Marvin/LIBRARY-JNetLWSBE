@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.management.RuntimeErrorException;
 
 import jnet.JNet;
+import jnet.d2.physic.SoftBody2d.Particle2d;
 import jnet.d3.physic.SoftBody3d.CollisionPlane3d;
 import jnet.d3.physic.SoftBody3d.Constrain3d;
 import jnet.d3.physic.SoftBody3d.Particle3d;
@@ -244,14 +245,35 @@ public class PhysicSolver3d {
 	 */
 	public void solveCollision(Contact3d contact) {
 		
-		if (!contact.isCollision()) return;
-		
+//		if (!contact.isCollision()) return;
+//		
 		Particle3d particle1 = contact.getParticle();
 		Particle3d particle2A = contact.getPlane().particleA;
 		Particle3d particle2B = contact.getPlane().particleB;
 		Particle3d particle2C = contact.getPlane().particleC;
+//		
+//		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth()));
+//		
+//		double distA = particle1.pos.distance(particle2A.pos);
+//		double distB = particle1.pos.distance(particle2A.pos);
+//		double distC = particle1.pos.distance(particle2A.pos);
+//		
+//		double ca = distA / (distA + distB + distC);
+//		double cb = distB / (distA + distB + distC);
+//		double cc = distC / (distA + distB + distC);
+//		
+//		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca));
+//		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb));
+//		particle2C.pos = particle2C.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cc));
 		
-		particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth()));
+		
+		
+		if (!contact.isCollision()) return;
+		
+		
+		boolean staticPart = particle1.isStatic || particle2A.isStatic || particle2B.isStatic;
+		
+		if (!particle1.isStatic) particle1.pos = particle1.pos.add(contact.getCollisionNormal().mul(contact.getCollisionDepth() * (staticPart ? 2 : 1.5)));
 		
 		double distA = particle1.pos.distance(particle2A.pos);
 		double distB = particle1.pos.distance(particle2A.pos);
@@ -261,9 +283,9 @@ public class PhysicSolver3d {
 		double cb = distB / (distA + distB + distC);
 		double cc = distC / (distA + distB + distC);
 		
-		particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * ca));
-		particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cb));
-		particle2C.pos = particle2C.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * cc));
+		if (!particle2A.isStatic) particle2A.pos = particle2A.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * (staticPart ? 2 : 1.5) * cb));
+		if (!particle2B.isStatic) particle2B.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * (staticPart ? 2 : 1.5) * ca));
+		if (!particle2C.isStatic) particle2C.pos = particle2B.pos.add(contact.getCollisionNormal().mul(-contact.getCollisionDepth() * (staticPart ? 2 : 1.5) * cc));
 		
 	}
 	
